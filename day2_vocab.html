@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>День 2 — English Words B2</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: #1e1e2e;
+    --text: #e8e6f0;
+    --muted: #5a5870;
+    --accent: #00e5a0;
+    --accent2: #ff6b35;
+    --accent3: #a78bfa;
+    --b1: #38bdf8;
+    --b2: #fb923c;
+    --gold: #fbbf24;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Crimson Pro', serif;
+    min-height: 100vh;
+    padding: 48px 20px 80px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: -200px;
+    left: -200px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(0,229,160,0.04) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -200px;
+    right: -200px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(167,139,250,0.04) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  header {
+    max-width: 1100px;
+    margin: 0 auto 56px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 24px;
+  }
+
+  .header-left {}
+
+  .day-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(52px, 10vw, 88px);
+    letter-spacing: 2px;
+    line-height: 1;
+    color: var(--text);
+  }
+
+  h1 em {
+    color: var(--accent);
+    font-style: normal;
+  }
+
+  .header-right {
+    text-align: right;
+  }
+
+  .level-badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    padding: 6px 14px;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    border-radius: 2px;
+    margin-bottom: 8px;
+  }
+
+  .word-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 2px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 32px 28px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s ease, transform 0.2s ease;
+    animation: slideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    cursor: default;
+  }
+
+  .card:nth-child(1) { animation-delay: 0.0s; }
+  .card:nth-child(2) { animation-delay: 0.07s; }
+  .card:nth-child(3) { animation-delay: 0.14s; }
+  .card:nth-child(4) { animation-delay: 0.21s; }
+  .card:nth-child(5) { animation-delay: 0.28s; }
+  .card:nth-child(6) { animation-delay: 0.35s; }
+  .card:nth-child(7) { animation-delay: 0.42s; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    z-index: 1;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .card:hover::before { opacity: 1; }
+
+  .card-index {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    color: rgba(255,255,255,0.03);
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .word-type {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 8px;
+  }
+
+  .word-en {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 44px;
+    letter-spacing: 1px;
+    line-height: 1;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .word-ru {
+    font-size: 15px;
+    color: var(--muted);
+    font-weight: 300;
+    margin-bottom: 14px;
+  }
+
+  .definitions {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .def-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .def-lang {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1px;
+    color: var(--accent3);
+    margin-top: 3px;
+    flex-shrink: 0;
+    width: 16px;
+  }
+
+  .def-text {
+    font-size: 13px;
+    line-height: 1.5;
+    color: rgba(232,230,240,0.6);
+    font-style: italic;
+  }
+
+  .def-text.en-def {
+    color: rgba(167,139,250,0.7);
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 16px 0;
+  }
+
+  .sentences {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .sent-block {
+    padding: 12px 14px;
+    border-radius: 1px;
+    position: relative;
+  }
+
+  .sent-block.b1 {
+    background: rgba(56,189,248,0.05);
+    border-left: 2px solid var(--b1);
+  }
+
+  .sent-block.b2 {
+    background: rgba(251,146,60,0.05);
+    border-left: 2px solid var(--b2);
+  }
+
+  .sent-level {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+
+  .b1 .sent-level { color: var(--b1); }
+  .b2 .sent-level { color: var(--b2); }
+
+  .sent-en {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .sent-en strong {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .sent-ru {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.4;
+    font-style: italic;
+  }
+
+  footer {
+    max-width: 1100px;
+    margin: 60px auto 0;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+  }
+
+  .footer-accent {
+    color: var(--accent);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="day-tag">// English · Daily Vocab</div>
+    <h1>ДЕНЬ <em>02</em></h1>
+  </div>
+  <div class="header-right">
+    <div class="level-badge">B2 LEVEL</div>
+    <div class="word-count">7 WORDS · MIXED</div>
+  </div>
+</header>
+
+<div class="grid">
+
+  <!-- 1 -->
+  <div class="card">
+    <div class="card-index">1</div>
+    <div class="word-type">verb</div>
+    <div class="word-en">Pursue</div>
+    <div class="word-ru">преследовать / добиваться / стремиться</div>
+    <div class="definitions">
+      <div class="def-row">
+        <span class="def-lang">RU</span>
+        <span class="def-text">активно стремиться к достижению цели или продолжать какое-либо дело</span>
+      </div>
+      <div class="def-row">
+        <span class="def-lang">EN</span>
+        <span class="def-text en-def">to follow or chase something; to continue or proceed along a path or goal</span>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="sentences">
+      <div class="sent-block b1">
+        <div class="sent-level">B1</div>
+        <div class="sent-en">She decided to <strong>pursue</strong> a career in medicine.</div>
+        <div class="sent-ru">Она решила сделать карьеру в медицине.</div>
+      </div>
+      <div class="sent-block b2">
+        <div class="sent-level">B2</div>
+        <div class="sent-en">He <strong>pursued</strong> every lead relentlessly until the case was solved.</div>
+        <div class="sent-ru">Он неустанно прорабатывал каждую зацепку, пока дело не было раскрыто.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2 -->
+  <div class="card">
+    <div class="card-index">2</div>
+    <div class="word-type">adjective</div>
+    <div class="word-en">Inevitable</div>
+    <div class="word-ru">неизбежный / неотвратимый</div>
+    <div class="definitions">
+      <div class="def-row">
+        <span class="def-lang">RU</span>
+        <span class="def-text">то, что обязательно произойдёт и что невозможно предотвратить</span>
+      </div>
+      <div class="def-row">
+        <span class="def-lang">EN</span>
+        <span class="def-text en-def">certain to happen; impossible to avoid or prevent</span>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="sentences">
+      <div class="sent-block b1">
+        <div class="sent-level">B1</div>
+        <div class="sent-en">Change is <strong>inevitable</strong> — nothing stays the same.</div>
+        <div class="sent-ru">Перемены неизбежны — ничто не остаётся прежним.</div>
+      </div>
+      <div class="sent-block b2">
+        <div class="sent-level">B2</div>
+        <div class="sent-en">Given the circumstances, a conflict between the two parties seemed <strong>inevitable</strong>.</div>
+        <div class="sent-ru">При данных обстоятельствах конфликт между двумя сторонами казался неизбежным.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 -->
+  <div class="card">
+    <div class="card-index">3</div>
+    <div class="word-type">noun</div>
+    <div class="word-en">Resilience</div>
+    <div class="word-ru">устойчивость / стойкость / способность восстанавливаться</div>
+    <div class="definitions">
+      <div class="def-row">
+        <span class="def-lang">RU</span>
+        <span class="def-text">способность быстро восстанавливаться после трудностей, неудач или кризисов</span>
+      </div>
+      <div class="def-row">
+        <span class="def-lang">EN</span>
+        <span class="def-text en-def">the ability to recover quickly from difficulties; toughness and adaptability under pressure</span>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="sentences">
+      <div class="sent-block b1">
+        <div class="sent-level">B1</div>
+        <div class="sent-en">Children often show amazing <strong>resilience</strong> after hard times.</div>
+        <div class="sent-ru">Дети часто проявляют удивительную стойкость после тяжёлых времён.</div>
+      </div>
+      <div class="sent-block b2">
+        <div class="sent-level">B2</div>
+        <div class="sent-en">The economy demonstrated remarkable <strong>resilience</strong> despite the global crisis.</div>
+        <div class="sent-ru">Экономика продемонстрировала замечательную устойчивость несмотря на мировой кризис.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <div class="card">
+    <div class="card-index">4</div>
+    <div class="word-type">verb</div>
+    <div class="word-en">Acknowledge</div>
+    <div class="word-ru">признавать / подтверждать / замечать</div>
+    <div class="definitions">
+      <div class="def-row">
+        <span class="def-lang">RU</span>
+        <span class="def-text">признавать существование или правду чего-либо; выражать благодарность или уважение</span>
+      </div>
+      <div class="def-row">
+        <span class="def-lang">EN</span>
+        <span class="def-text en-def">to accept or admit the existence or truth of something; to recognize or express gratitude</span>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="sentences">
+      <div class="sent-block b1">
+        <div class="sent-level">B1</div>
+        <div class="sent-en">He finally <strong>acknowledged</strong> that he was wrong.</div>
+        <div class="sent-ru">Он наконец признал, что был неправ.</div>
+      </div>
+      <div class="sent-block b2">
+        <div class="sent-level">B2</div>
+        <div class="sent-en">The report <strong>acknowledges</strong> several gaps in the current research.</div>
+        <div class="sent-ru">В докладе признаётся наличие нескольких пробелов в текущих исследованиях.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5 -->
+  <div class="card">
+    <div class="card-index">5</div>
+    <div class="word-type">adjective</div>
+    <div class="word-en">Ambiguous</div>
+    <div class="word-ru">неоднозначный / двусмысленный</div>
+    <div class="definitions">
+      <div class="def-row">
+        <span class="def-lang">RU</span>
+        <span class="def-text">имеющий несколько возможных значений или допускающий различные толкования</span>
+      </div>
+      <div class="def-row">
+        <span class="def-lang">EN</span>
+        <span class="def-text en-def">open to more than one interpretation; not having a clear meaning or intention</span>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="sentences">
+      <div class="sent-block b1">
+        <div class="sent-level">B1</div>
+        <div class="sent-en">His answer was <strong>ambiguous</strong> — I wasn't sure what he meant.</div>
+        <div class="sent-ru">Его ответ был неоднозначным — я не был уверен, что он имел в виду.</div>
+      </div>
+      <div class="sent-block b2">
+        <div class="sent-level">B2</div>
+        <div class="sent-en">The contract contained several <strong>ambiguous</strong> clauses that led to a dispute.</div>
+        <div class="sent-ru">Договор содержал несколько двусмысленных пунктов, что привело к спору.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6 -->
+  <div class="card">
+    <div class="card-index">6</div>
+    <div class="word-type">noun</div>
+    <div class="word-en">Consequence</div>
+    <div class="word-ru">последствие / результат / следствие</div>
+    <div class="definitions">
+      <div class="def-row">
+        <span class="def-lang">RU</span>
+        <span class="def-text">результат или эффект действия или условия, часто негативный</span>
+      </div>
+      <div class="def-row">
+        <span class="def-lang">EN</span>
+        <span class="def-text en-def">a result or effect of an action or condition, typically an unwelcome one</span>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="sentences">
+      <div class="sent-block b1">
+        <div class="sent-level">B1</div>
+        <div class="sent-en">There are <strong>consequences</strong> for every decision you make.</div>
+        <div class="sent-ru">За каждым принятым решением стоят последствия.</div>
+      </div>
+      <div class="sent-block b2">
+        <div class="sent-level">B2</div>
+        <div class="sent-en">Failing to act now could have serious <strong>consequences</strong> for future generations.</div>
+        <div class="sent-ru">Бездействие сейчас может иметь серьёзные последствия для будущих поколений.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7 -->
+  <div class="card">
+    <div class="card-index">7</div>
+    <div class="word-type">verb</div>
+    <div class="word-en">Anticipate</div>
+    <div class="word-ru">предвидеть / ожидать / предвосхищать</div>
+    <div class="definitions">
+      <div class="def-row">
+        <span class="def-lang">RU</span>
+        <span class="def-text">ожидать или предсказывать что-то заранее и готовиться к этому</span>
+      </div>
+      <div class="def-row">
+        <span class="def-lang">EN</span>
+        <span class="def-text en-def">to expect or predict something and prepare for it in advance</span>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="sentences">
+      <div class="sent-block b1">
+        <div class="sent-level">B1</div>
+        <div class="sent-en">We <strong>anticipate</strong> a lot of people at the event.</div>
+        <div class="sent-ru">Мы ожидаем много людей на мероприятии.</div>
+      </div>
+      <div class="sent-block b2">
+        <div class="sent-level">B2</div>
+        <div class="sent-en">A good leader <strong>anticipates</strong> problems before they arise.</div>
+        <div class="sent-ru">Хороший лидер предвидит проблемы до того, как они возникнут.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span class="footer-text">DAY <span class="footer-accent">02</span> · APRIL 23, 2026</span>
+  <span class="footer-text">СЛЕДУЮЩИЕ СЛОВА → <span class="footer-accent">ЗАВТРА</span></span>
+</footer>
+
+</body>
+</html>
