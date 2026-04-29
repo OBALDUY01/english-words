@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avatar: The Last Airbender — Vocabulary Deck</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #0a1628;
+    --sky2: #0d1f3c;
+    --air: #e8f4f8;
+    --fire: #e85d26;
+    --fire2: #f59e3f;
+    --earth: #4a7c3f;
+    --water: #2d7bbd;
+    --gold: #c9a84c;
+    --gold2: #f0d080;
+    --text: #e8dcc8;
+    --text-dim: #9a8e7a;
+    --border: rgba(201,168,76,0.2);
+    --card-bg: rgba(255,255,255,0.03);
+    --card-hover: rgba(201,168,76,0.06);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--sky);
+    color: var(--text);
+    font-family: 'Crimson Pro', Georgia, serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 10%, rgba(45,123,189,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(232,93,38,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse 100% 80% at 50% 50%, rgba(10,22,40,0) 0%, #060e1a 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .stars {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle var(--dur, 3s) ease-in-out infinite var(--delay, 0s);
+  }
+  @keyframes twinkle {
+    0%,100%{opacity:var(--min,0.1);}
+    50%{opacity:var(--max,0.7);}
+  }
+
+  /* Header */
+  header {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 52px 24px 36px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .deck-badge {
+    display: inline-block;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    opacity: 0.8;
+  }
+
+  header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(22px, 5vw, 42px);
+    font-weight: 700;
+    color: var(--gold2);
+    letter-spacing: 2px;
+    line-height: 1.2;
+    text-shadow: 0 0 40px rgba(201,168,76,0.4), 0 2px 4px rgba(0,0,0,0.8);
+    margin-bottom: 8px;
+  }
+
+  header p {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+  }
+
+  /* Four nations ornament */
+  .ornament {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin: 20px 0 0;
+  }
+  .nation-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    opacity: 0.7;
+  }
+  .nd-air  { background: var(--air);   box-shadow: 0 0 8px var(--air); }
+  .nd-fire { background: var(--fire);  box-shadow: 0 0 8px var(--fire); }
+  .nd-earth{ background: var(--earth); box-shadow: 0 0 8px var(--earth);}
+  .nd-water{ background: var(--water); box-shadow: 0 0 8px var(--water);}
+
+  /* Search bar */
+  .search-wrap {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    padding: 16px 20px;
+    background: rgba(6,14,26,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .search-inner {
+    max-width: 720px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    color: var(--gold);
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  #q {
+    width: 100%;
+    padding: 12px 16px 12px 42px;
+    background: rgba(201,168,76,0.06);
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 3px;
+    color: var(--text);
+    font-family: 'Crimson Pro', serif;
+    font-size: 17px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  #q:focus {
+    border-color: rgba(201,168,76,0.55);
+    background: rgba(201,168,76,0.09);
+  }
+  #q::placeholder { color: var(--text-dim); font-style: italic; }
+
+  .search-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+    max-width: 720px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Cards list */
+  .cards-wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 8px 20px 60px;
+    position: relative;
+    z-index: 10;
+  }
+
+  .entry {
+    border-bottom: 1px solid var(--border);
+    padding: 16px 4px;
+    transition: background 0.15s;
+    animation: fadeIn 0.3s ease both;
+    cursor: default;
+  }
+  .entry:hover {
+    background: var(--card-hover);
+    border-radius: 4px;
+    padding-left: 12px;
+    padding-right: 12px;
+    margin: 0 -8px;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .entry-top {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+  }
+
+  .headword {
+    font-family: 'Cinzel', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gold2);
+    letter-spacing: 0.5px;
+  }
+
+  .meaning {
+    font-size: 13px;
+    font-style: italic;
+    color: var(--text-dim);
+    flex: 1;
+  }
+
+  .ru {
+    font-size: 15px;
+    color: var(--text);
+    margin-bottom: 6px;
+    line-height: 1.5;
+  }
+
+  .ex {
+    border-left: 2px solid rgba(201,168,76,0.3);
+    padding-left: 12px;
+    margin-top: 6px;
+  }
+  .ex-en {
+    font-size: 13px;
+    font-style: italic;
+    color: rgba(232,220,200,0.75);
+    line-height: 1.5;
+  }
+  .ex-ru {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+
+  /* No results */
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    font-style: italic;
+    color: var(--text-dim);
+    font-size: 18px;
+  }
+  .empty span { display: block; font-size: 32px; margin-bottom: 12px; }
+
+  /* Highlight match */
+  mark {
+    background: rgba(201,168,76,0.3);
+    color: var(--gold2);
+    border-radius: 2px;
+    padding: 0 1px;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 24px;
+    font-size: 12px;
+    color: rgba(154,142,122,0.4);
+    letter-spacing: 1px;
+    font-family: 'Cinzel', serif;
+    position: relative;
+    z-index: 10;
+  }
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<header>
+  <div class="deck-badge">Vocabulary Deck</div>
+  <h1>Avatar: The Last Airbender</h1>
+  <p>423 words &amp; expressions from the series</p>
+  <div class="ornament">
+    <div class="nation-dot nd-air"></div>
+    <div class="nation-dot nd-fire"></div>
+    <div class="nation-dot nd-earth"></div>
+    <div class="nation-dot nd-water"></div>
+  </div>
+</header>
+
+<div class="search-wrap">
+  <div class="search-inner">
+    <span class="search-icon">⟡</span>
+    <input type="text" id="q" placeholder="Search in English or Russian…" oninput="filter()" autocomplete="off" spellcheck="false">
+  </div>
+  <div class="search-meta">
+    <span id="cnt"></span>
+    <span>EN · RU · meaning</span>
+  </div>
+</div>
+
+<div class="cards-wrap">
+  <div id="list"></div>
+</div>
+
+<footer>✦ &nbsp; The four nations lived in harmony &nbsp; ✦</footer>
+
+<script>
+// Generate stars
+(function(){
+  var s=document.getElementById('stars');
+  for(var i=0;i<120;i++){
+    var d=document.createElement('div');
+    d.className='star';
+    var sz=Math.random()<0.7?1:Math.random()<0.5?1.5:2;
+    d.style.cssText='width:'+sz+'px;height:'+sz+'px;top:'+Math.random()*100+'%;left:'+Math.random()*100+'%;'
+      +'--dur:'+(2+Math.random()*4)+'s;--delay:'+(Math.random()*5)+'s;'
+      +'--min:'+(0.05+Math.random()*0.1)+';--max:'+(0.3+Math.random()*0.6)+';';
+    s.appendChild(d);
+  }
+})();
+
+const data=[{en:"go big or go home",meaning:"do something with full effort or don’t do it",ru:"либо по-крупному, либо никак",ex_en:"If we start this project, let’s go big or go home.",ex_ru:"Если мы начинаем этот проект, давай делать по-крупному."},
+{en:"taunting someone",meaning:"making fun of someone to provoke them",ru:"дразнить, провоцировать",ex_en:"He kept taunting his opponent during the match.",ex_ru:"Он постоянно дразнил своего соперника во время матча."},
+{en:"tangled",meaning:"twisted together in a messy way",ru:"запутанный",ex_en:"Her hair got tangled in the wind.",ex_ru:"Её волосы запутались на ветру"},
+{en:"someone’s in love",meaning:"feeling romantic love",ru:"кто-то влюблён",ex_en:"He’s smiling all the time — he’s in love.",ex_ru:"Он всё время улыбается — он влюблён."},
+{en:"tease someone",meaning:"to make jokes about someone",ru:"дразнить",ex_en:"They teased him about his new haircut.",ex_ru:"Они подшучивали над его новой причёской."},
+{en:"close one",meaning:"something almost happened",ru:"чуть не случилось / едва",ex_en:"That was a close one, we almost missed the train.",ex_ru:"Это было близко, мы чуть не опоздали на поезд."},
+{en:"punch someone in the belly",meaning:"to hit someone in the stomach",ru:"ударить кого-то в живот",ex_en:"He punched him in the belly during the fight.",ex_ru:"Он ударил его в живот во время драки."},
+{en:"likewise",meaning:"the same to you",ru:"взаимно",ex_en:"Nice to meet you. — Likewise.",ex_ru:"Приятно познакомиться. — Взаимно."},
+{en:"keep an open mind",meaning:"be willing to consider new ideas",ru:"быть открытым к новому",ex_en:"Try to keep an open mind about different opinions.",ex_ru:"Старайся быть открытым к разным мнениям."},
+{en:"anguish",meaning:"severe mental or physical pain",ru:"мучение, страдание",ex_en:"She cried in anguish after hearing the news.",ex_ru:"Она плакала от боли после новости."},
+{en:"self-inflicted",meaning:"caused by oneself",ru:"причинённый самому себе",ex_en:"It was a self-inflicted mistake.",ex_ru:"Это была ошибка, которую он сам себе причинил."},
+{en:"much obliged",meaning:"a formal or old-fashioned way of expressing gratitude; deeply thankful",ru:"очень признателен / премного благодарен",ex_en:"He tipped his hat and said he was much obliged, a gesture so rare in the modern world that it caught everyone in the room off guard.",ex_ru:"Он приподнял шляпу и сказал, что очень признателен, — жест настолько редкий в современном мире, что он застал всех в комнате врасплох."},
+{en:"prat about",meaning:"to waste time behaving in a silly or irresponsible way instead of doing something useful",ru:"дурачиться / валять дурака",ex_en:"The project deadline was rapidly approaching, yet half the team was still pratting about instead of addressing the most critical outstanding tasks.",ex_ru:"Дедлайн проекта стремительно приближался, однако половина команды всё ещё валяла дурака вместо того, чтобы заниматься наиболее критически важными нерешёнными задачами."},
+{en:"hypothetical",meaning:"based on a situation that is imagined or supposed rather than real",ru:"гипотетический / предположительный",ex_en:"It's just a hypothetical scenario. — Это просто гипотетический сценарий.",ex_ru:"The professor presented a hypothetical situation to the students in order to encourage them to think critically about the ethical implications of the policy."},
+{en:"allegedly",meaning:"used to indicate that something is claimed to be true but has not yet been proven",ru:"предположительно / по имеющимся сведениям",ex_en:"The executive allegedly authorised payments to several shell companies, though no formal charges had been brought against him at the time of the report.",ex_ru:"Руководитель предположительно санкционировал выплаты нескольким подставным компаниям, хотя на момент публикации доклада официальных обвинений ему предъявлено не было."},
+{en:"yell at",meaning:"to shout at someone loudly, usually in anger or frustration",ru:"кричать на / орать на",ex_en:"Rather than yelling at his players after the loss, the coach calmly gathered the team and focused the discussion on what could be improved next time.",ex_ru:"Вместо того чтобы кричать на игроков после поражения, тренер спокойно собрал команду и сосредоточил обсуждение на том, что можно улучшить в следующий раз."},
+{en:"yield",meaning:"to produce or provide something; to give way to pressure or authority; to surrender",ru:"уступать / давать / приносить / сдаваться",ex_en:"The land yielded a rich harvest. — Земля дала богатый урожай.",ex_ru:"After weeks of intense negotiation, the opposing party finally yielded to pressure and agreed to a compromise that had previously seemed impossible."},
+{en:"get over something",meaning:"to recover from something difficult such as an illness, loss, or disappointment",ru:"оправиться / пережить / справиться",ex_en:"She got over the breakup eventually. — В конце концов она пережила расставание.",ex_ru:"It took him considerably longer than expected to get over the failure of his first business, but the experience ultimately made him a far more resilient entrepreneur."},
+{en:"descendants",meaning:"a person or animal that is related to one who lived in the past; offspring of a particular ancestor",ru:"потомки / наследники",ex_en:"They are descendants of royalty. — Они потомки королевской семьи.",ex_ru:"The descendants of the original settlers had maintained many of the cultural traditions brought over by their ancestors centuries ago."},
+{en:"rubble",meaning:"broken pieces of brick, stone, or concrete, typically from a damaged or destroyed building",ru:"щебень / обломки / развалины",ex_en:"The building was reduced to rubble. — Здание было превращено в щебень.",ex_ru:"Rescue workers searched through the rubble for survivors for several days following the earthquake, refusing to abandon hope despite the devastating scale of the destruction."},
+{en:"will be on someone's head",meaning:"used to say that someone will be responsible for the consequences of a decision or action",ru:"ляжет на чью-либо голову / будет на чьей-либо совести",ex_en:"If this goes wrong, it's on your head. — Если что-то пойдёт не так, это будет на твоей совести.",ex_ru:"The director made it absolutely clear that if the launch failed due to corners being cut, the consequences would be entirely on the project manager's head."},
+{en:"execution",meaning:"carrying out a plan or punishment",ru:"выполнение / казнь",ex_en:"The execution of the plan went smoothly.",ex_ru:"Выполнение плана прошло гладко."},
+{en:"explosives",meaning:"materials that can explode",ru:"взрывчатка",ex_en:"The police found explosives in the building.",ex_ru:"Полиция нашла взрывчатку в здании."},
+{en:"way up there",meaning:"very high or far above",ru:"очень высоко / далеко наверху",ex_en:"The plane was way up there in the sky.",ex_ru:"Самолёт был очень высоко в небе."},
+{en:"enlightened",meaning:"having greater understanding or wisdom",ru:"просвещённый",ex_en:"He became more enlightened after traveling the world.",ex_ru:"Он стал более просвещённым после путешествий."},
+{en:"go after",meaning:"to chase or try to get something",ru:"преследовать / добиваться",ex_en:"He went after his dreams.",ex_ru:"Он пошёл за своими мечтами."},
+{en:"in any way",meaning:"in any manner",ru:"каким-либо образом",ex_en:"I didn’t help in any way.",ex_ru:"Я никак не помог."},
+{en:"on and on",meaning:"continuously, without stopping",ru:"без конца",ex_en:"He talked on and on about his trip.",ex_ru:"Он без конца говорил о своей поездке."},
+{en:"soothing",meaning:"calming and relaxing",ru:"успокаивающий",ex_en:"The music was very soothing.",ex_ru:"Музыка была очень успокаивающей."},
+{en:"restraint",meaning:"control over emotions or actions",ru:"сдержанность, контроль",ex_en:"She showed great restraint.",ex_ru:"Она проявила большую сдержанность."},
+{en:"flee",meaning:"to run away from danger",ru:"убегать, спасаться бегством",ex_en:"The animals fled from the fire.",ex_ru:"Животные убежали от огня."},
+{en:"no match",meaning:"not equal in ability or strength",ru:"не соперник",ex_en:"He was no match for his opponent.",ex_ru:"Он не был соперником своему противнику."},
+{en:"wild shot",meaning:"an inaccurate attempt or guess",ru:"дикая попытка / промах",ex_en:"That was a wild shot, but it worked.",ex_ru:"Это была случайная попытка, но она сработала."},
+{en:"sloppy",meaning:"careless and messy",ru:"небрежный",ex_en:"His work was sloppy and full of mistakes.",ex_ru:"Его работа была небрежной и с ошибками."},
+{en:"I’d love to",meaning:"Meaning: polite enthusiastic way to say “I want to”",ru:"с радостью / с удовольствием",ex_en:"B1: I’d love to join you. — Я бы с радостью присоединился.",ex_ru:"B2: I’d love to help you with this project if I had more free time. — Я бы с удовольствием помог тебе с этим проектом, если бы у меня было больше свободного времени."},
+{en:"treacherous",meaning:"dangerous or untrustworthy",ru:"коварный / опасный",ex_en:"B2: The road is treacherous in winter. — Дорога зимой опасная.",ex_ru:"B2+: He turned out to be a treacherous ally who betrayed everyone at the worst possible moment. — Он оказался коварным союзником, который предал всех в самый неподходящий момент."},
+{en:"быть в городе на некоторое время",meaning:"(be) in town for a while",ru:"town for a while",ex_en:"B1: I’ll be in town for a while. — Я буду в городе некоторое время.",ex_ru:"B2: I’m in town for a while, so let’s meet up and catch up on everything. — Я ненадолго в городе, давай встретимся и обсудим всё."},
+{en:"do an activity",meaning:"do an activity",ru:"заниматься какой-либо деятельностью",ex_en:"B1: We did an activity together. — Мы вместе чем-то занимались.",ex_ru:"B2: The teacher asked us to do a group activity to improve our communication skills. — Учитель попросил нас выполнить групповое задание, чтобы улучшить навыки общения."},
+{en:"to be destined",meaning:"to be destined (to do something)",ru:"быть предназначенным / судьбой предрешено",ex_en:"B2: He was destined to succeed. — Ему было суждено добиться успеха.",ex_ru:"B2+: She felt that she was destined to achieve something great despite all the obstacles. — Она чувствовала, что ей суждено достичь чего-то великого, несмотря на все препятствия."},
+{en:"fit / match right in",meaning:"fit perfectly into a group or situation",ru:"идеально вписываться",ex_en:"B2: He matched right in. — Он идеально вписался.",ex_ru:"B2+: Despite being new, she matched right in with the team as if she had worked there for years. — Несмотря на то что она была новенькой, она идеально вписалась в команду."},
+{en:"stick",meaning:"continue doing / not give up",ru:"придерживаться / не сдаваться",ex_en:"B1: Stick to your plan. — Придерживайся своего плана.",ex_ru:"B2: If you stick to your goals, you will eventually succeed. — Если ты будешь придерживаться своих целей, ты в итоге добьёшься успеха."},
+{en:"big jerk",meaning:"very rude or unpleasant person",ru:"придурок / грубиян",ex_en:"B1: He’s such a jerk. — Он такой придурок.",ex_ru:"B2: He acted like a big jerk during the meeting, interrupting everyone and ignoring their opinions. — Он вел себя как полный грубиян на встрече."},
+{en:"betrothal",meaning:"engagement to be married (formal)",ru:"помолвка",ex_en:"B2: Their betrothal was announced. — Их помолвка была объявлена.",ex_ru:"B2+: The betrothal was arranged by their families long before they even met each other. — Их помолвка была устроена семьями задолго до их знакомства."},
+{en:"the spitting image of someone",meaning:"look exactly like someone",ru:"вылитая копия",ex_en:"B2: He is the spitting image of his father. — Он вылитая копия своего отца.",ex_ru:"B2+: She is the spitting image of her mother, not only in appearance but also in personality. — Она вылитая копия своей матери."},
+{en:"arranged marriage to someone",meaning:"marriage organized by families",ru:"брак по договорённости",ex_en:"B2: She had an arranged marriage. — У неё был брак по договорённости.",ex_ru:"B2+: He was forced into an arranged marriage to someone he barely knew. — Его заставили вступить в брак по договорённости с человеком, которого он почти не знал."},
+{en:"devastated",meaning:"extremely upset",ru:"опустошён / разбит",ex_en:"B2: She was devastated. — Она была опустошена.",ex_ru:"B2+: He was devastated after losing everything he had worked for over the years. — Он был полностью разбит после потери всего, над чем работал годами."},
+{en:"run-in with someone",meaning:"unpleasant encounter",ru:"неприятная встреча / столкновение",ex_en:"B2: I had a run-in with him. — У меня была неприятная встреча с ним.",ex_ru:"B2+: He had a run-in with the police after breaking several traffic rules. — У него была неприятная ситуация с полицией после нарушения правил."},
+{en:"study closely",meaning:"examine carefully",ru:"тщательно изучать",ex_en:"B2: Study it closely. — Изучи это внимательно.",ex_ru:"B2+: Scientists studied the phenomenon closely to understand its underlying causes. — Учёные тщательно изучили явление."},
+{en:"stow away",meaning:"hide on a vehicle to travel secretly",ru:"пробраться тайком (на корабль/самолёт)",ex_en:"B2: He stowed away on a ship. — Он тайком пробрался на корабль.",ex_ru:"B2+: The boy stowed away on a cargo ship hoping to start a new life in another country. — Мальчик тайком пробрался на грузовое судно."},
+{en:"peasant",meaning:"poor farmer (historical)",ru:"крестьянин",ex_en:"B1: He was a peasant. — Он был крестьянином.",ex_ru:"B2: The story describes the life of peasants in medieval times. — История описывает жизнь крестьян в средневековье."},
+{en:"confused",meaning:"not understanding",ru:"запутанный / в замешательстве",ex_en:"B1: I am confused. — Я запутался.",ex_ru:"B2: He looked confused after hearing the complicated explanation. — Он выглядел растерянным после сложного объяснения."},
+{en:"want someone to do something",meaning:"to desire that another person performs an action",ru:"хотеть, чтобы кто-то что-то сделал",ex_en:"B2: I want you to finish the report. — Я хочу, чтобы ты закончил отчет.",ex_ru:"C1: Although they were tired, the manager wanted them to complete the project by midnight to meet the strict deadline.Несмотря на усталость, менеджер хотел, чтобы они завершили проект к полуночи, чтобы уложиться в строгий дедлайн."},
+{en:"in order to / so that",meaning:"showing the purpose or reason for an action",ru:"для того чтобы / так чтобы",ex_en:"B2: Use a map so that you don't get lost. — Используй карту, чтобы не заблудиться.",ex_ru:"C1: He deliberately arrived early in order to prepare the hall so that the presentation would run successfully without any technical issues.Он намеренно пришел пораньше, чтобы подготовить зал, дабы презентация прошла успешно и без технических сбоев."},
+{en:"make someone do / be made to do",meaning:"to force someone to act / to be forced to act",ru:"заставлять / быть вынужденным",ex_en:"B2: My boss made me work late. — Босс заставил меня работать допоздна.",ex_ru:"C1: While parents often make their children do chores, the students were made to redo the entire assignment because it was done ineffectively.В то время как родители часто заставляют детей делать работу по дому, студентов заставили переделать все задание, так как оно было выполнено неэффективно."},
+{en:"have something done",meaning:"to arrange for someone else to do something for you",ru:"когда что-то делают за/для тебя (услуга)",ex_en:"B2: I need to have my car repaired. — Мне нужно отремонтировать машину (в сервисе).",ex_ru:"C1: To ensure the house is stable, they decided to have the foundation checked by a professional before the weather becomes unstable.Чтобы убедиться в устойчивости дома, они решили проверить фундамент у профессионала, прежде чем погода станет нестабильной."},
+{en:"used to do / get used to (accustomed to)",meaning:"past habit / the process of becoming familiar with something",ru:"раньше делал / привыкать",ex_en:"B2: I used to drink coffee, but now I'm getting used to tea. — Раньше я пил кофе, но сейчас привыкаю к чаю.",ex_ru:"C1: She used to live in a quiet village, so she is still getting accustomed to the highly noisy and currently overcrowded city life.Раньше она жила в тихой деревушке, поэтому до сих пор привыкает к очень шумной и в настоящее время переполненной городской жизни."},
+{en:"would prefer to / would sooner / would rather / had better",meaning:"expressing preferences or giving strong advice",ru:"предпочтения и советы",ex_en:"B2: I’d rather stay home. You’d better go now. — Я бы лучше остался дома. Тебе бы лучше идти сейчас.",ex_ru:"C1: I would sooner quit than work under such pressure; frankly, you had better talk to the director before the situation gets worse.Я бы скорее уволился, чем работал под таким давлением; честно говоря, вам бы лучше поговорить с директором, пока ситуация не ухудшилась."},
+{en:"deliberately / on purpose",meaning:"intentionally, not by accident",ru:"намеренно / специально",ex_en:"B2: Did you do that on purpose? — Ты сделал это специально?",ex_ru:"C1: It doesn't mean that he failed by mistake; he deliberately ignored the instructions on purpose to see what would happen.Это не значит, что он ошибся случайно; он намеренно проигнорировал инструкции специально, чтобы посмотреть, что произойдет"},
+{en:"mostly / mainly because of",meaning:"for the most part; primarily due to",ru:"в основном / главным образом из-за",ex_en:"B2: I'm late mostly because of the traffic. — Я опоздал в основном из-за пробок.",ex_ru:"C1: The project was mainly successful because of the team's ability to stay calm, even though the system was temporarily unstable.Проект был в основном успешным благодаря способности команды сохранять спокойствие, даже когда система была временно нестабильна."},
+{en:"highly appreciate / significantly",meaning:"to value something very much / in a sufficiently great way",ru:"высоко ценить / значительно",ex_en:"B2: I highly appreciate your help. — Я высоко ценю вашу помощь.",ex_ru:"C1: The company's profits increased significantly, and the board members highly appreciate the effort you put into the marketing campaign.Прибыль компании значительно выросла, и члены правления высоко ценят усилия, которые вы вложили в маркетинговую кампанию."},
+{en:"frankly / to be frank / naturally",meaning:"used to express honesty / as expected",ru:"честно говоря / естественно",ex_en:"B2: Frankly, I don't care. — Честно говоря, мне все равно.",ex_ru:"C1: To be frank, the task was relatively easy, but naturally, some employees struggled because the software was currently unavailable.Честно говоря, задача была относительно легкой, но, естественно, некоторые сотрудники столкнулись с трудностями, так как ПО было временно недоступно."},
+{en:"no doubt / undoubtedly / nevertheless",meaning:"certainly / however; despite that",ru:"без сомнения / тем не менее",ex_en:"B2: No doubt he is right. — Без сомнения, он прав.",ex_ru:"C1: There is no doubt that the situation is difficult; nevertheless, we must complete the work perfectly to maintain our reputation.Нет сомнений в том, что ситуация сложная; тем не менее, мы должны выполнить работу идеально, чтобы сохранить свою репутацию."},
+{en:"be allowed to do / let someone do",meaning:"to have permission to do something",ru:"иметь разрешение / позволять",ex_en:"B2: You are not allowed to smoke here. — Здесь нельзя курить.",ex_ru:"C1: Although they were allowed to use the library, the librarian made them keep quiet so that others could focus on their work.Хотя им разрешили пользоваться библиотекой, библиотекарь заставил их соблюдать тишину, чтобы остальные могли сосредоточиться на работе"},
+{en:"mostly / especially / particularly",meaning:"mainly or to a great extent; more than usual",ru:"в основном / особенно",ex_en:"B2: I like fruit, especially apples. — Я люблю фрукты, особенно яблоки.",ex_ru:"C1: The results were mostly positive, especially considering that the team had to work under such hard conditions with relatively little support.Результаты были в основном положительными, особенно если учесть, что команде пришлось работать в таких тяжелых условиях при сравнительно небольшой поддержке."},
+{en:"hard / hardly",meaning:"with a lot of effort / almost not at all",ru:"усердно / едва ли (совсем нет)",ex_en:"B2: He works hard. I can hardly hear you. — Он много работает. Я тебя почти не слышу.",ex_ru:"C1: She worked hard all night, but she had hardly finished the first chapter when the power went out, making it ineffective to continue.Она усердно работала всю ночь, но едва закончила первую главу, как отключили свет, из-за чего продолжать было бессмысленно (неэффективно)."},
+{en:"actually / it doesn't mean that",meaning:"in fact / used to clarify that a conclusion might be wrong",ru:"на самом деле / это не значит, что",ex_en:"B2: Actually, I'm busy. — Вообще-то я занят.",ex_ru:"C1: Actually, the data is relatively accurate; it doesn't mean that we can stop checking, but it is undoubtedly a good start.На самом деле данные относительно точны; это не значит, что мы можем прекратить проверку, но это, несомненно, хорошее начало."},
+{en:"currently / unavailable",meaning:"at the present time / not possible to get or use",ru:"в настоящее время / недоступен",ex_en:"B2: This service is currently unavailable. — Эта услуга сейчас недоступна.",ex_ru:"C1: To be short, the system is currently unavailable due to maintenance, which is highly frustrating for those who need it urgently.Короче говоря, система в данный момент недоступна из-за техобслуживания, что крайне досадно для тех, кому она нужна срочно."},
+{en:"thanks to / hopefully",meaning:"because of someone or something / used to express a wish",ru:"благодаря / надеюсь, что",ex_en:"B2: Thanks to your help, I finished. — Благодаря твоей помощи я закончил.",ex_ru:"C1: Thanks to the significant investment, we will hopefully be able to stabilize the market by the end of the year.Благодаря значительным инвестициям, мы, надеюсь, сможем стабилизировать рынок к концу года."},
+{en:"shortly / to be short",meaning:"in a short time / briefly",ru:"вскоре / короче говоря",ex_en:"B2: The train will arrive shortly. — Поезд прибудет в ближайшее время.",ex_ru:"C1: To be short, the manager will contact you shortly regarding the partly finished project.Короче говоря, менеджер вскоре свяжется с вами по поводу частично завершенного проекта."},
+{en:"slightly / partly / finally",meaning:"a little bit / not completely / after a long time",ru:"слегка / частично / наконец",ex_en:"B2: The price is slightly higher. — Цена немного выше.",ex_ru:"C1: The plan was only partly successful because the budget was slightly underestimated; however, we finally reached an agreement.План был успешен лишь частично, так как бюджет был слегка недооценен; тем не менее, мы наконец пришли к соглашению."},
+{en:"I would sooner / I would rather (+ verb)",meaning:"to prefer one thing over another",ru:"я бы скорее / я бы лучше",ex_en:"B2: I would rather stay home than go out in the rain. — Я бы лучше остался дома, чем шел гулять под дождем.",ex_ru:"C1: To be frank, I would sooner resign than accept such unethical terms, as I highly appreciate integrity in business.Честно говоря, я бы скорее уволился, чем принял такие неэтичные условия, так как я высоко ценю честность в бизнесе."},
+{en:"I had better (+ verb)",meaning:"used to give strong advice or tell someone what to do",ru:"мне бы лучше (совет/предупреждение)",ex_en:"B2: You’d better see a doctor. — Тебе бы лучше сходить к врачу.",ex_ru:"C1: We had better double-check the contract, as it contains some relatively complex clauses that could lead to unstable legal ground.Нам бы лучше перепроверить контракт, так как он содержит довольно сложные пункты, которые могут привести к нестабильной правовой позиции."},
+{en:"perfectly / definitely / mostly",meaning:"in a faultless way / without doubt / for the most part",ru:"совершенно / определенно / в основном",ex_en:"B2: It is perfectly normal. — Это совершенно нормально.",ex_ru:"C1: I definitely think we should proceed, as the system is perfectly capable of handling the current load, even if it is mostly manual for now.Я определенно считаю, что нам нужно продолжать, так как система совершенно способна справиться с текущей нагрузкой, даже если сейчас она в основном ручная."},
+{en:"especially / occasionally / successfully",meaning:"particularly / from time to time / in a way that achieves results",ru:"особенно / изредка / успешно",ex_en:"B2: We meet occasionally for coffee. — Мы изредка встречаемся выпить кофе.",ex_ru:"C1: The team successfully launched the app, which is especially impressive given that the main server was unavailable for half the day.Команда успешно запустила приложение, что особенно впечатляет, учитывая, что основной сервер был недоступен полдня."},
+{en:"actually / it doesn't mean that",meaning:"used to correct a misconception or add detail",ru:"на самом деле / это не значит, что",ex_en:"B2: Actually, I have already seen this film. — На самом деле, я уже видел этот фильм.",ex_ru:"C1: The results were slightly lower than expected, but actually, it doesn't mean that the strategy failed; it was mainly because of external factors.Результаты были чуть ниже ожидаемых, но на самом деле это не значит, что стратегия провалилась; это произошло в основном из-за внешних факторов."},
+{en:"natural(ly) / contain / relatively",meaning:"as expected / to have inside / to a certain degree",ru:"eстественно / содержать / относительно",ex_en:"B2: Naturally, he was angry. — Естественно, он был зол.",ex_ru:"C1: This product contains organic ingredients, so it is naturally more expensive, though still relatively easy to find in local shops.Этот продукт содержит органические ингредиенты, поэтому он, естественно, дороже, хотя его всё же относительно легко найти в местных магазинах."},
+{en:"nearly / near / nevertheless",meaning:"almost / close to / despite what has just been said",ru:"почти / рядом / тем не менее",ex_en:"B2: It’s nearly 10 o’clock. — Уже почти 10 часов.",ex_ru:"C1: We have nearly finished the project; nevertheless, some parts remain partly incomplete, which is undoubtedly a concern for the client.Мы почти закончили проект; тем не менее, некоторые части остаются частично незавершенными, что, несомненно, беспокоит клиента."},
+{en:"final(ly) / no doubt / undoubtedly",meaning:"after a long time / used to emphasize that something is true",ru:"наконец / без сомнения / несомненно",ex_en:"B2: Finally, the bus arrived. — Наконец-то приехал автобус.",ex_ru:"C1: There is no doubt that she is the best candidate; she will undoubtedly lead the company to a more stable future.Нет сомнений, что она — лучший кандидат; она, несомненно, приведет компанию к более стабильному будущему."},
+{en:"delve / dive (into)",meaning:"to explore or examine deeply",ru:"углубляться, погружаться",ex_en:"She decided to delve into the topic in more detail.",ex_ru:"Она решила глубже изучить тему."},
+{en:"put something to work",meaning:"to use something effectively",ru:"пустить в дело, использовать",ex_en:"He put his skills to work on the project.",ex_ru:"Он применил свои навыки в проекте."},
+{en:"two-tiered",meaning:"having two levels or parts",ru:"двухуровневый",ex_en:"They introduced a two-tiered system.",ex_ru:"Они внедрили двухуровневую систему."},
+{en:"to be given the sack",meaning:"to be fired from a job",ru:"быть уволенным",ex_en:"He was given the sack for being late too often.",ex_ru:"Его уволили за частые опоздания."},
+{en:"to be provided with the bag (лучше: left holding the bag)",meaning:"to be left responsible unfairly",ru:"остаться крайним",ex_en:"He was left holding the bag after the deal failed.",ex_ru:"В итоге он остался крайним после провала сделки."},
+{en:"remotely",meaning:"in a distant or slight way",ru:"отдалённо, хоть сколько-нибудь",ex_en:"I’m not even remotely interested.",ex_ru:"Мне это совсем не интересно."},
+{en:"fraction",meaning:"a small part of something",ru:"доля, часть",ex_en:"Only a fraction of people agreed.",ex_ru:"Лишь малая часть людей согласилась"},
+{en:"downplay",meaning:"to make something seem less important",ru:"преуменьшать",ex_en:"He tried to downplay the issue.",ex_ru:"Он попытался преуменьшить проблему."},
+{en:"daydream",meaning:"to think pleasant thoughts instead of focusing",ru:"мечтать наяву",ex_en:"She tends to daydream during lectures.",ex_ru:"Она часто мечтает на лекциях."},
+{en:"enthuse",meaning:"to express excitement",ru:"восторгаться, говорить с энтузиазмом",ex_en:"He enthused about the new idea.",ex_ru:"Он с энтузиазмом говорил о новой идее."},
+{en:"step into",meaning:"to take a role or position",ru:"вступать, принимать на себя",ex_en:"She stepped into a leadership role.",ex_ru:"Она взяла на себя роль лидера."},
+{en:"hang on tight",meaning:"hold firmly",ru:"держись крепче",ex_en:"Hang on tight, it’s going to be a rough ride.",ex_ru:"Держись крепче, поездка будет жёсткой."},
+{en:"wish for",meaning:"to want something strongly",ru:"желать",ex_en:"She wished for success.",ex_ru:"Она желала успеха."},
+{en:"count someone in",meaning:"to include someone",ru:"включить кого-то",ex_en:"Count me in for the trip.",ex_ru:"Запиши меня в поездку."},
+{en:"take it from here",meaning:"I will handle it now",ru:"дальше я сам",ex_en:"You can relax, I’ll take it from here.",ex_ru:"Можешь расслабиться, дальше я сам."},
+{en:"you’ve gotta be kidding me",meaning:"expression of disbelief",ru:"ты, должно быть, шутишь",ex_en:"You’ve gotta be kidding me, that can’t be true.",ex_ru:"Ты, должно быть, шутишь, этого не может быть."},
+{en:"what of it",meaning:"why does it matter",ru:"ну и что",ex_en:"So I was late — what of it?",ex_ru:"Ну да, я опоздал — и что?"},
+{en:"twilight",meaning:"time between day and night",ru:"сумерки",ex_en:"They walked during twilight.",ex_ru:"Они гуляли в сумерках."},
+{en:"halt something",meaning:"to stop something",ru:"остановить",ex_en:"The police halted the operation.",ex_ru:"Полиция остановила операцию."},
+{en:"daybreak",meaning:"the start of the day",ru:"рассвет",ex_en:"They left at daybreak.",ex_ru:"Они ушли на рассвете."},
+{en:"squeeze through",meaning:"to pass through a tight space",ru:"протиснуться",ex_en:"He squeezed through the narrow gap.",ex_ru:"Он протиснулся через узкий проход."},
+{en:"nag someone",meaning:"to keep complaining",ru:"пилить, надоедать",ex_en:"Stop nagging me about it.",ex_ru:"Перестань меня пилить из-за этого."},
+{en:"perks",meaning:"extra benefits",ru:"бонусы, привилегии",ex_en:"The job comes with great perks.",ex_ru:"У этой работы хорошие бонусы."},
+{en:"self-absorbed weasel",meaning:"selfish and sneaky person",ru:"самовлюблённый подлец",ex_en:"He’s just a self-absorbed weasel.",ex_ru:"Он просто самовлюблённый подлец."},
+{en:"tranquil",meaning:"calm and peaceful",ru:"спокойный",ex_en:"It was a tranquil place by the lake.",ex_ru:"Это было спокойное место у озера."},
+{en:"cross over",meaning:"to move from one side to another",ru:"переходить",ex_en:"They crossed over the bridge.",ex_ru:"Они перешли через мост."},
+{en:"resist the inevitable",meaning:"to try to stop something unavoidable",ru:"сопротивляться неизбежному",ex_en:"He tried to resist the inevitable change.",ex_ru:"Он пытался сопротивляться неизбежным изменениям."},
+{en:"come up with",meaning:"to think of an idea",ru:"придумать",ex_en:"She came up with a great solution.",ex_ru:"Она придумала отличное решение."},
+{en:"hold on to",meaning:"to keep something",ru:"держаться за",ex_en:"Hold on to your dreams.",ex_ru:"Держись за свои мечты."},
+{en:"leave the gathering",meaning:"to go away from an event",ru:"покинуть встречу",ex_en:"He left the gathering early.",ex_ru:"Он рано покинул встречу."},
+{en:"inappropriately",meaning:"in a wrong or improper way",ru:"неподобающим образом",ex_en:"He behaved inappropriately.",ex_ru:"Он вёл себя неподобающим образом."},
+{en:"backbite",meaning:"to speak badly about someone secretly",ru:"злословить за спиной",ex_en:"They tend to backbite their colleagues.",ex_ru:"Они склонны обсуждать коллег за спиной."},
+{en:"fallout",meaning:"bad results of a situation",ru:"последствия, негативный результат",ex_en:"There was serious fallout after the decision.",ex_ru:"После решения были серьёзные последствия."},
+{en:"shove oneself",meaning:"to push oneself forward",ru:"проталкиваться",ex_en:"He shoved himself into the crowd.",ex_ru:"Он протолкался в толпу."},
+{en:"behold",meaning:"to look at something impressive",ru:"узреть, вот",ex_en:"Behold the beauty of nature.",ex_ru:"Узри красоту природы."},
+{en:"conquer",meaning:"to defeat or overcome",ru:"завоёвывать, преодолевать",ex_en:"He conquered his fears.",ex_ru:"Он преодолел свои страхи."},
+{en:"miserable",meaning:"трепетал, порхал",ru:"жалкий, несчастный",ex_en:"He felt miserable after the loss.",ex_ru:"Он чувствовал себя несчастным после поражения."},
+{en:"fluttered",meaning:"to move lightly and quickly",ru:"трепетал, порхал",ex_en:"Her heart fluttered with excitement.",ex_ru:"Её сердце затрепетало от волнения."},
+{en:"albeit",meaning:"although",ru:"хотя, несмотря на то что",ex_en:"He is confident, albeit a little nervous.",ex_ru:"Он уверенный, хотя немного нервный."},
+{en:"reluctantly",meaning:"unwillingly",ru:"неохотно",ex_en:"She reluctantly agreed to help.",ex_ru:"Она неохотно согласилась помочь."},
+{en:"infamous",meaning:"well known for something bad",ru:"печально известный",ex_en:"The city is infamous for its crime rate.",ex_ru:"Город печально известен уровнем преступности."},
+{en:"gauge",meaning:"to measure or judge",ru:"измерять, оценивать",ex_en:"It’s hard to gauge his reaction.",ex_ru:"Трудно оценить его реакцию."},
+{en:"wobble",meaning:"to move unsteadily",ru:"шататься",ex_en:"The table wobbled on the uneven floor.",ex_ru:"Стол шатался на неровном полу."},
+{en:"precarious",meaning:"unstable or dangerous",ru:"ненадёжный, шаткий",ex_en:"He stood on a precarious ledge.",ex_ru:"Он стоял на шатком выступе."},
+{en:"while also",meaning:"at the same time adding another action",ru:"при этом также",ex_en:"He studies hard while also working part-time.",ex_ru:"Он усердно учится, при этом также работает."},
+{en:"set aside something for something",meaning:"to reserve or save",ru:"откладывать / выделять",ex_en:"She set aside money for travel.",ex_ru:"Она отложила деньги на путешествие."},
+{en:"prepping",meaning:"prepping",ru:"подготовка",ex_en:"They are prepping for the exam.",ex_ru:"Они готовятся к экзамену."},
+{en:"speculate",meaning:"to guess without certainty",ru:"предполагать, строить догадки",ex_en:"We can only speculate about the outcome.",ex_ru:"Мы можем только строить догадки о результате."},
+{en:"shoot in the dark",meaning:"a random guess",ru:"пальцем в небо",ex_en:"It was just a shot in the dark.",ex_ru:"Это было просто предположение наугад."},
+{en:"amiss",meaning:"wrong or suspicious",ru:"не так, неправильно",ex_en:"Something felt amiss.",ex_ru:"Что-то казалось не так"},
+{en:"to a halt",meaning:"to stop completely",ru:"до полной остановки",ex_en:"The train came to a halt.",ex_ru:"Поезд полностью остановился."},
+{en:"shelter",meaning:"protection from danger or weather",ru:"укрытие",ex_en:"They found shelter from the storm.",ex_ru:"Они нашли укрытие от шторма."},
+{en:"blizzard",meaning:"severe snowstorm",ru:"метель",ex_en:"We got caught in a blizzard.",ex_ru:"Мы попали в метель."},
+{en:"stumble upon",meaning:"to find accidentally",ru:"наткнуться",ex_en:"I stumbled upon an old photo.",ex_ru:"Я случайно наткнулся на старое фото."},
+{en:"thrilled with",meaning:"very excited or happy about something",ru:"в восторге от",ex_en:"She was thrilled with the results.",ex_ru:"Она была в восторге от результатов."},
+{en:"slay",meaning:"to do something extremely well",ru:"разнести / сделать идеально (сленг)",ex_en:"She slayed the performance.",ex_ru:"Она выступила просто идеально."},
+{en:"to be here awhile",meaning:"to stay for some time",ru:"быть здесь какое-то время",ex_en:"I’ll be here awhile, so we can talk.",ex_ru:"Я побуду здесь какое-то время, так что мы можем поговорить."},
+{en:"good riddance",meaning:"relief that someone/something is gone",ru:"туда ему и дорога / наконец-то ушёл",ex_en:"He finally quit, good riddance.",ex_ru:"Он наконец уволился — туда ему и дорога."},
+{en:"good to be back",meaning:"it feels nice to return somewhere",ru:"приятно вернуться",ex_en:"Good to be back home after the trip.",ex_ru:"Приятно вернуться домой после поездки."},
+{en:"faint",meaning:"very weak or to lose consciousness",ru:"слабый / терять сознание",ex_en:"She felt faint and had to sit down.",ex_ru:"Ей стало плохо, и она была вынуждена сесть."},
+{en:"plead",meaning:"to beg or make an emotional request",ru:"умолять / заявлять (в суде)",ex_en:"He pleaded for another chance.",ex_ru:"Он умолял дать ему ещё один шанс."},
+{en:"invincible",meaning:"impossible to defeat",ru:"непобедимый",ex_en:"He felt invincible after his victory.",ex_ru:"Он чувствовал себя непобедимым после победы."},
+{en:"on you tenfold",meaning:"something will come back much stronger",ru:"вернётся тебе в десятикратном размере",ex_en:"Whatever you do will come back on you tenfold.",ex_ru:"Всё, что ты делаешь, вернётся тебе в десятикратном размере."},
+{en:"disgrace",meaning:"a situation causing shame",ru:"позор",ex_en:"The scandal was a disgrace to the company.",ex_ru:"Скандал стал позором для компании."},
+{en:"via",meaning:"by way of or through",ru:"через, посредством",ex_en:"We traveled to Paris via Berlin.",ex_ru:"Мы поехали в Париж через Берлин."},
+{en:"by way of",meaning:"through a place or method",ru:"через, посредством",ex_en:"He sent the package by way of courier.",ex_ru:"Он отправил посылку через курьера."},
+{en:"dodgy",meaning:"not trustworthy or unsafe",ru:"подозрительный, сомнительный",ex_en:"That deal sounds a bit dodgy.",ex_ru:"Эта сделка звучит подозрительно."},
+{en:"inherently",meaning:"in a natural or essential way",ru:"по своей природе",ex_en:"The system is inherently flawed.",ex_ru:"Система по своей природе несовершенна."},
+{en:"substitute for",meaning:"to take the place of something",ru:"заменять",ex_en:"You can substitute sugar for honey in this recipe.",ex_ru:"Ты можешь заменить сахар мёдом в этом рецепте."},
+{en:"banish",meaning:"to send someone away permanently",ru:"изгнать",ex_en:"He was banished from the kingdom.",ex_ru:"Его изгнали из королевства."},
+{en:"disgraced",meaning:"having lost respect or honor",ru:"опозоренный",ex_en:"The official was disgraced after the scandal.",ex_ru:"Чиновник был опозорен после скандала."},
+{en:"hesitate",meaning:"to pause before doing something",ru:"колебаться",ex_en:"Don’t hesitate to ask questions.",ex_ru:"Не стесняйся задавать вопросы."},
+{en:"tides",meaning:"the rise and fall of the sea",ru:"приливы и отливы",ex_en:"The tides change twice a day.",ex_ru:"Приливы меняются два раза в день."},
+{en:"pull someone in",meaning:"to attract or involve someone",ru:"втягивать, привлекать",ex_en:"The story pulled me in immediately.",ex_ru:"История сразу меня увлекла."},
+{en:"mighty",meaning:"very powerful or strong",ru:"могущественный, сильный",ex_en:"He is a mighty warrior.",ex_ru:"Он могущественный воин."},
+{en:"meathead",meaning:"a stupid or insensitive person",ru:"тупица (разговорное)",ex_en:"Don’t be such a meathead.",ex_ru:"Не будь таким тупицей."},
+{en:"go ahead and glow it up",meaning:"improve or upgrade something",ru:"давай, сделай это лучше / прокачай",ex_en:"Go ahead and glow it up, make it look amazing.",ex_ru:"Давай, прокачай это, сделай круто."},
+{en:"induce",meaning:"to cause something",ru:"вызывать, приводить к",ex_en:"The medicine may induce sleep.",ex_ru:"Лекарство может вызвать сон."},
+{en:"tenfold",meaning:"ten times more",ru:"в десять раз",ex_en:"The effort paid off tenfold.",ex_ru:"Усилия окупились в десять раз."},
+{en:"escort",meaning:"to go with someone for protection or guidance",ru:"сопровождать",ex_en:"He escorted her to the door.",ex_ru:"Он проводил её до двери."},
+{en:"run off to",meaning:"to leave quickly for a place",ru:"убежать / быстро уйти куда-то",ex_en:"He ran off to the store without saying anything.",ex_ru:"Он убежал в магазин, ничего не сказав."},
+{en:"snazzy (for)",meaning:"fashionable and attractive",ru:"стильный, эффектный",ex_en:"That’s a snazzy outfit for the party.",ex_ru:"Это стильный наряд для вечеринки."},
+{en:"affecting someone",meaning:"having an impact on someone",ru:"влиять на кого-то",ex_en:"The news is deeply affecting her.",ex_ru:"Эта новость сильно влияет на неё."},
+{en:"to cover ground",meaning:"to cover ground",ru:"покрывать расстояние, продвигаться",ex_en:"B1: We covered a lot of ground on our hike today. — Мы прошли большое расстояние во время похода сегодня.",ex_ru:"B2: Despite the tight deadline, the team managed to cover significant ground on the project by working overtime. — Несмотря на сжатые сроки, команда смогла существенно продвинуться в проекте, работая сверхурочно."},
+{en:"far apart",meaning:"separated by a large distance",ru:"далеко друг от друга",ex_en:"B1: My best friend and I live far apart now. — Мы с лучшим другом сейчас живём далеко друг от друга.",ex_ru:"B2: Although they were born far apart in age, the siblings have always been incredibly close. — Хотя между ними большая разница в возрасте, эти братья и сёстры всегда были невероятно близки."},
+{en:"nomad",meaning:"a person who moves from place to place without a permanent home",ru:"кочевник",ex_en:"B1: He lives like a modern nomad, traveling constantly. — Он живёт как современный кочевник, постоянно путешествуя.",ex_ru:"B2: Digital nomads are redefining the traditional workplace by earning a living while exploring different countries. — Цифровые кочевники переопределяют традиционное рабочее место, зарабатывая на жизнь и исследуя разные страны."},
+{en:"delectable",meaning:"delicious; extremely pleasant to taste",ru:"восхитительный, изысканный (о еде)",ex_en:"B1: The chocolate cake was absolutely delectable! — Шоколадный торт был абсолютно восхитительным!",ex_ru:"B2: The Michelin-starred restaurant served a delectable tasting menu that highlighted seasonal ingredients. — Ресторан, отмеченный звездой Мишлен, подавал восхитительное дегустационное меню, подчёркивающее сезонные ингредиенты."},
+{en:"deadly",meaning:"causing or able to cause death; extremely harmful",ru:"смертельный, смертоносный",ex_en:"B1: Some mushrooms are deadly if you eat them. — Некоторые грибы смертельны, если их съесть.",ex_ru:"B2: The combination of speed and reckless driving proved deadly, resulting in a tragic accident on the highway. — Сочетание скорости и безрассудного вождения оказалось смертельным, что привело к трагической аварии на шоссе."},
+{en:"something it is / that's what it is",meaning:"used to accept a situation as it is; that's the reality",ru:"вот так вот; такова реальность",ex_en:"B1: I don't like it, but that's what it is. — Мне это не нравится, но что поделать.",ex_ru:"B2: The job isn't perfect and the hours are long, but that's what it is when you're climbing the corporate ladder. — Работа не идеальна, и часы длинные, но такова реальность, когда ты поднимаешься по карьерной лестнице."},
+{en:"refugee",meaning:"a person forced to leave their country due to war, persecution, or disaster",ru:"беженец",ex_en:"B1: Many refugees are seeking safety in neighboring countries. — Многие беженцы ищут безопасность в соседних странах.",ex_ru:"B2: The refugee crisis has prompted humanitarian organizations to establish emergency shelters and provide essential services. — Кризис беженцев побудил гуманитарные организации создать экстренные убежища и предоставить основные услуги."},
+{en:"declare (declare – declared – declared)",meaning:"to announce officially or publicly",ru:"объявлять, заявлять",ex_en:"B1: The president declared a national holiday. — Президент объявил национальный праздник.",ex_ru:"B2: After reviewing all the evidence, the jury declared the defendant not guilty on all charges. — После рассмотрения всех доказательств присяжные объявили подсудимого невиновным по всем обвинениям."},
+{en:"destination",meaning:"место назначения, пункт назначения",ru:"место назначения, пункт назначения",ex_en:"B1: Paris is a popular tourist destination. — Париж — популярное туристическое направление.",ex_ru:"B2: Despite several flight delays and layovers, we finally arrived at our destination exhausted but excited. — Несмотря на несколько задержек рейсов и пересадок, мы наконец прибыли в пункт назначения уставшие, но взволнованные."},
+{en:"staple",meaning:"a main or important element; a basic food item",ru:"основной продукт; главный элемент",ex_en:"B1: Rice is a staple food in many Asian countries. — Рис — основной продукт питания во многих азиатских странах.",ex_ru:"B2: Coffee has become such a staple of office culture that most companies provide it free to employees. — Кофе стал настолько важным элементом офисной культуры, что большинство компаний предоставляют его бесплатно сотрудникам"},
+{en:"fall out of something",meaning:"to drop or come out of something accidentally",ru:"выпасть из чего-то",ex_en:"B1: My phone fell out of my pocket. — Мой телефон выпал из кармана.",ex_ru:"B2: When I opened the old photo album, several handwritten letters fell out of the pages, revealing a hidden family story. — Когда я открыл старый фотоальбом, несколько рукописных писем выпали из страниц, открывая скрытую семейную историю."},
+{en:"integral part",meaning:"an essential or fundamental component",ru:"неотъемлемая часть",ex_en:"B1: Teamwork is an integral part of success. — Командная работа — неотъемлемая часть успеха.",ex_ru:"B2: Regular exercise and balanced nutrition have become integral parts of my daily routine since I started prioritizing my health. — Регулярные упражнения и сбалансированное питание стали неотъемлемыми частями моего ежедневного распорядка с тех пор, как я начал уделять приоритет здоровью."},
+{en:"to be in for a shock",meaning:"about to experience something surprising or unpleasant",ru:"ждёт шок; будет неприятно удивлён",ex_en:"B1: If you think this test is easy, you're in for a shock! — Если ты думаешь, что этот тест лёгкий, тебя ждёт сюрприз!",ex_ru:"B2: Anyone expecting a relaxing vacation at that resort is in for a shock when they discover it's under major construction. — Любой, кто ожидает расслабляющий отпуск на том курорте, будет шокирован, когда обнаружит, что там идёт капитальный ремонт."},
+{en:"tweak (tweak – tweaked – tweaked)",meaning:"to make small adjustments or improvements",ru:"подкорректировать, слегка изменить",ex_en:"B1: I need to tweak this essay before submitting it. — Мне нужно подкорректировать это эссе перед сдачей.",ex_ru:"B2: After tweaking the marketing strategy based on customer feedback, we saw a 30% increase in engagement. — После корректировки маркетинговой стратегии на основе отзывов клиентов мы увидели 30% рост вовлечённости."},
+{en:"pump (pump – pumped – pumped)",meaning:"to move liquid or gas using a pump; to fill with air",ru:"качать, накачивать",ex_en:"B1: I need to pump air into my bicycle tires. — Мне нужно накачать шины велосипеда.",ex_ru:"B2: The gym was pumping energetic music to motivate the early morning workout crowd. — Спортзал качал энергичную музыку, чтобы мотивировать утреннюю тренировочную толпу."},
+{en:"stock",meaning:"goods available for sale; shares in a company; broth for cooking",ru:"запас; акции; бульон",ex_en:"B1: This item is out of stock right now. — Этого товара сейчас нет в наличии.",ex_ru:"B2: The company's stock plummeted after the CEO announced unexpected quarterly losses during the earnings call. — Акции компании резко упали после того, как генеральный директор объявил о неожиданных квартальных убытках во время отчётного звонка."},
+{en:"mouthful",meaning:"a large amount of food in the mouth; something difficult to say",ru:"полный рот; труднопроизносимое слово",ex_en:"B1: That's quite a mouthful — can I just call you by your nickname? — Это трудно выговорить — могу я просто называть тебя по прозвищу?",ex_ru:"B2: Her official job title is such a mouthful that even she prefers to simplify it when introducing herself. — Её официальное название должности настолько труднопроизносимо, что даже она предпочитает упрощать его при представлении."},
+{en:"investigate (investigate – investigated – investigated)",meaning:"to examine or research something carefully",ru:"расследовать, исследовать",ex_en:"B1: The police are investigating the robbery. — Полиция расследует ограбление.",ex_ru:"B2: The committee was appointed to investigate allegations of corruption within the department before making policy recommendations. — Комитет был назначен для расследования обвинений в коррупции внутри департамента перед составлением политических рекомендаций."},
+{en:"from someone's perspective",meaning:"according to someone's point of view",ru:"с чьей-то точки зрения",ex_en:"B1: From my perspective, the plan won't work. — С моей точки зрения, план не сработает.",ex_ru:"B2: From the customer's perspective, the new return policy seems unnecessarily restrictive and inconvenient. — С точки зрения клиента, новая политика возврата кажется излишне ограничительной и неудобной."},
+{en:"facilitate (facilitate – facilitated – facilitated)",meaning:"to make something easier or help it happen",ru:"способствовать, облегчать",ex_en:"B1: Technology can facilitate learning. — Технологии могут облегчить обучение.",ex_ru:"B2: The new communication platform is designed to facilitate seamless collaboration between international teams across different time zones. — Новая коммуникационная платформа разработана для облегчения беспрепятственного сотрудничества между международными командами в разных часовых поясах."},
+{en:"on gaining supremacy",meaning:"focused on achieving dominance or superiority",ru:"в достижении превосходства",ex_en:"B1: The team is focused on gaining supremacy in the league. — Команда сосредоточена на достижении превосходства в лиге.",ex_ru:"B2: The tech giant's strategy has always centered on gaining market supremacy through continuous innovation rather than aggressive pricing. — Стратегия технологического гиганта всегда была сосредоточена на достижении рыночного превосходства через постоянные инновации, а не агрессивное ценообразование."},
+{en:"exquisite",meaning:"extremely beautiful and delicate; of exceptional quality",ru:"изысканный, утончённый",ex_en:"B1: The jewelry is exquisite. — Украшения изысканные.",ex_ru:"B2: The art gallery featured exquisite paintings from the Renaissance period, each piece meticulously restored to its original glory. — Художественная галерея представляла изысканные картины эпохи Ренессанса, каждое произведение тщательно восстановлено в первоначальном великолепии."},
+{en:"scrumptious",meaning:"extremely tasty and appetizing",ru:"восхитительный, аппетитный",ex_en:"B1: This dessert looks scrumptious! — Этот десерт выглядит восхитительно!",ex_ru:"B2: The bakery's window display featured an array of scrumptious pastries that made it impossible to walk by without stopping. — Витрина пекарни демонстрировала массу аппетитных выпечек, мимо которых было невозможно пройти, не остановившись."},
+{en:"let the ideas flow",meaning:"allow creativity to happen naturally without restriction",ru:"дать идеям литься; позволить идеям течь свободно",ex_en:"B1: Just relax and let the ideas flow. — Просто расслабься и дай идеям течь.",ex_ru:"B2: During brainstorming sessions, it's crucial to let the ideas flow freely without judgment before evaluating their feasibility. — Во время мозговых штурмов крайне важно позволить идеям свободно литься без осуждения, прежде чем оценивать их осуществимость."},
+{en:"what else",meaning:"asking for additional information or items",ru:"что ещё",ex_en:"B1: What else do you need from the store? — Что ещё тебе нужно из магазина?",ex_ru:"B2: We've covered the budget, timeline, and deliverables — what else should we discuss before finalizing the proposal? — Мы рассмотрели бюджет, сроки и результаты — что ещё нам следует обсудить перед финализацией предложения?"},
+{en:"petite",meaning:"(of a woman) small and slender",ru:"миниатюрная, хрупкая",ex_en:"B1: She's petite but very strong. — Она миниатюрная, но очень сильная.",ex_ru:"B2: Despite her petite frame, she's an accomplished martial artist who has won numerous national championships. — Несмотря на миниатюрное телосложение, она опытная мастер боевых искусств, выигравшая множество национальных чемпионатов."},
+{en:"monetary",meaning:"relating to money or currency",ru:"денежный, финансовый",ex_en:"B1: The company offers monetary rewards for good performance. — Компания предлагает денежные вознаграждения за хорошую производительность.",ex_ru:"B2: The central bank's monetary policy adjustments have far-reaching implications for inflation rates and economic stability. — Корректировки денежно-кредитной политики центрального банка имеют далеко идущие последствия для уровня инфляции и экономической стабильности."},
+{en:"check this out",meaning:"B1: Check this out — I found your favorite snack! — Зацени — я нашёл твою любимую закуску!\n\nB2: You won't believe what just arrived in the mail — check this out, it's the limited edition we've been waiting for! — Ты не поверишь, что только что пришло по почте — зацени, это лимитированное издание, которое мы ждали!",ru:"зацени это; посмотри на это",ex_en:"",ex_ru:""},
+{en:"to be enticing",meaning:"to be attractive and tempting",ru:"быть заманчивым, привлекательным",ex_en:"B1: The job offer sounds very enticing. — Предложение работы звучит очень заманчиво.",ex_ru:"B2: While the startup's salary package is enticing, the lack of job security and long hours make it a risky proposition. — Хотя зарплатный пакет стартапа заманчив, отсутствие гарантии занятости и длинные часы делают его рискованным предложением."},
+{en:"knock something out of the park (knock – knocked – knocked)",meaning:"to do something exceptionally well; to exceed expectations",ru:"сделать что-то на отлично; превзойти ожидания",ex_en:"B1: You really knocked that presentation out of the park! — Ты действительно великолепно провёл эту презентацию!",ex_ru:"B2: The marketing team absolutely knocked the campaign out of the park, generating triple the expected engagement in the first week. — Маркетинговая команда совершенно блестяще провела кампанию, создав тройную ожидаемую вовлечённость в первую неделю."},
+{en:"take one's leave (take – took – taken)",meaning:"to say goodbye and depart (formal)",ru:"откланяться, попрощаться и уйти",ex_en:"B1: I must take my leave now, it's getting late. — Я должен откланяться, уже поздно.",ex_ru:"B2: After thanking the hosts for their generous hospitality, the ambassador took his leave and returned to the embassy. — Поблагодарив хозяев за щедрое гостеприимство, посол откланялся и вернулся в посольство."},
+{en:"reward (reward – rewarded – rewarded)",meaning:"награда; вознаграждение",ru:"награда; вознаграждение",ex_en:"B1: Hard work always brings its rewards. — Тяжёлый труд всегда приносит свои награды.",ex_ru:"B2: The company implemented a comprehensive reward system to recognize exceptional performance and incentivize employee retention. — Компания внедрила комплексную систему вознаграждений для признания исключительной производительности и стимулирования удержания сотрудников."},
+{en:"devoted butler",meaning:"a loyal and dedicated personal servant",ru:"преданный дворецкий",ex_en:"B1: The family had a devoted butler for many years. — У семьи был преданный дворецкий много лет.",ex_ru:"B2: The devoted butler had served the estate for four decades, becoming an indispensable part of the household and a trusted confidant. — Преданный дворецкий служил имению четыре десятилетия, став незаменимой частью домашнего хозяйства и доверенным лицом."},
+{en:"seem effortless",meaning:"appear to require no effort; look easy",ru:"казаться лёгким; выглядеть без усилий",ex_en:"B1: She makes cooking seem effortless. — Она делает готовку такой, что кажется легко.",ex_ru:"B2: Professional dancers make complex choreography seem effortless, but years of rigorous training lie behind every graceful movement. — Профессиональные танцоры делают сложную хореографию как будто без усилий, но за каждым грациозным движением стоят годы строгих тренировок."},
+{en:"fabulous",meaning:"extremely good; wonderful; extraordinary",ru:"потрясающий, великолепный",ex_en:"B1: You look fabulous in that dress! — Ты выглядишь потрясающе в этом платье!",ex_ru:"B2: The hotel offered fabulous ocean views and world-class amenities that exceeded all our expectations. — Отель предлагал потрясающие виды на океан и услуги мирового класса, которые превзошли все наши ожидания."},
+{en:"ravishing",meaning:"extremely beautiful or attractive; stunning",ru:"восхитительный, ослепительный",ex_en:"B1: She looked ravishing at the party. — Она выглядела восхитительно на вечеринке.",ex_ru:"B2: The bride was absolutely ravishing in her custom-designed gown, capturing everyone's attention as she walked down the aisle. — Невеста была абсолютно ослепительна в своём платье на заказ, привлекая внимание всех, когда шла к алтарю."},
+{en:"contagious",meaning:"(of a disease) spread by contact; (of emotions) likely to spread to others",ru:"заразный; заразительный",ex_en:"B1: Her laughter is contagious — everyone starts laughing too! — Её смех заразителен — все начинают смеяться тоже!",ex_ru:"B2: The team leader's enthusiasm was so contagious that even the most skeptical members became excited about the new project. — Энтузиазм руководителя команды был настолько заразительным, что даже самые скептически настроенные члены стали воодушевлены новым проектом."},
+{en:"sewer",meaning:"an underground pipe that carries waste water and sewage",ru:"канализация, сточная труба",ex_en:"B1: The city is repairing the old sewer system. — Город ремонтирует старую канализационную систему.",ex_ru:"B2: After the heavy rainfall, the outdated sewer infrastructure couldn't handle the volume, causing flooding in several neighborhoods. — После сильного дождя устаревшая канализационная инфраструктура не справилась с объёмом, вызвав наводнение в нескольких районах."},
+{en:"agile",meaning:"able to move quickly and easily; mentally quick",ru:"ловкий, проворный; гибкий",ex_en:"B1: Cats are very agile animals. — Кошки очень ловкие животные.",ex_ru:"B2: The company adopted an agile approach to software development, allowing teams to respond quickly to changing market demands. — Компания приняла гибкий подход к разработке программного обеспечения, позволяя командам быстро реагировать на меняющиеся требования рынка."},
+{en:"fathom (fathom – fathomed – fathomed)",meaning:"to understand something; to measure the depth of water",ru:"постичь, понять; измерить глубину",ex_en:"B1: I can't fathom why he did that. — Я не могу понять, почему он это сделал.",ex_ru:"B2: Despite reading the report multiple times, she still couldn't fathom how such a critical error had gone unnoticed for months. — Несмотря на многократное чтение отчёта, она всё ещё не могла понять, как такая критическая ошибка оставалась незамеченной месяцами."},
+{en:"unbearably bleak",meaning:"extremely depressing and hopeless; intolerably gloomy",ru:"невыносимо мрачный/безрадостный",ex_en:"B1: The weather was unbearably bleak all winter. — Погода была невыносимо мрачной всю зиму.",ex_ru:"B2: The documentary painted an unbearably bleak picture of life in war-torn regions, leaving viewers deeply moved and troubled. — Документальный фильм нарисовал невыносимо мрачную картину жизни в раздираемых войной регионах, оставив зрителей глубоко тронутыми и обеспокоенными."},
+{en:"proposition",meaning:"a proposal or suggestion; a business offer; a statement to be proved",ru:"предложение; утверждение",ex_en:"B1: He made me an interesting business proposition. — Он сделал мне интересное деловое предложение.",ex_ru:"B2: The investment proposition seemed attractive on paper, but further analysis revealed significant hidden risks. — Инвестиционное предложение казалось привлекательным на бумаге, но дальнейший анализ выявил значительные скрытые риски."},
+{en:"take someone's word for something (take – took – taken)",meaning:"to believe what someone says without proof",ru:"поверить кому-то на слово",ex_en:"B1: I'll take your word for it. — Я поверю тебе на слово.",ex_ru:"B2: Instead of taking the salesperson's word for the car's condition, I hired a mechanic to conduct a thorough inspection. — Вместо того чтобы поверить продавцу на слово о состоянии машины, я нанял механика для проведения тщательной проверки."},
+{en:"invasion",meaning:"an act of invading a country or territory with armed forces; an unwelcome intrusion",ru:"вторжение, нашествие",ex_en:"B1: The invasion happened without warning. — Вторжение произошло без предупреждения.",ex_ru:"B2: The military invasion triggered a humanitarian crisis, forcing millions of civilians to flee their homes and seek refuge abroad. — Военное вторжение спровоцировало гуманитарный кризис, заставив миллионы мирных жителей покинуть свои дома и искать убежище за границей."},
+{en:"surrender (surrender – surrendered – surrendered)",meaning:"to stop fighting and admit defeat; to give up something",ru:"сдаваться, капитулировать",ex_en:"B1: The enemy forces decided to surrender. — Вражеские силы решили сдаться.",ex_ru:"B2: After weeks of intense negotiations, the company was forced to surrender control of its overseas operations to settle the debt. — После недель интенсивных переговоров компания была вынуждена отдать контроль над своими зарубежными операциями для погашения долга."},
+{en:"outnumbered",meaning:"having fewer people than the opposing group",ru:"в меньшинстве, в численном меньшинстве",ex_en:"B1: Our team was outnumbered three to one. — Наша команда была в меньшинстве три к одному.",ex_ru:"B2: Despite being heavily outnumbered by competitors, the small startup managed to capture significant market share through innovative marketing. — Несмотря на значительное численное превосходство конкурентов, небольшой стартап смог захватить значительную долю рынка благодаря инновационному маркетингу."},
+{en:"plague",meaning:"a deadly infectious disease; something that causes continual trouble",ru:"чума; бедствие; мучить",ex_en:"B1: The city was hit by a plague centuries ago. — Город был поражён чумой века назад.",ex_ru:"B2: Technical glitches continued to plague the new software release, frustrating users and damaging the company's reputation. — Технические сбои продолжали преследовать новый релиз программного обеспечения, раздражая пользователей и нанося ущерб репутации компании."},
+{en:"set the net",meaning:"to prepare a trap or strategy to catch someone/something",ru:"расставить сети, подготовить ловушку",ex_en:"B1: The fishermen set the net early in the morning. — Рыбаки расставили сети рано утром.",ex_ru:"B2: Investigators spent months setting the net before finally capturing the criminal organization's leaders in a coordinated raid. — Следователи потратили месяцы на расстановку сетей, прежде чем наконец захватить лидеров преступной организации в координированной облаве."},
+{en:"head count",meaning:"a count of the number of people present or employed",ru:"подсчёт голов; численность персонала",ex_en:"B1: Let's do a quick head count before we leave. — Давайте быстро пересчитаем всех перед уходом.",ex_ru:"B2: The HR department conducted a comprehensive head count to determine staffing needs across all departments for the upcoming fiscal year. — Отдел кадров провёл комплексный подсчёт численности персонала для определения потребностей в кадрах по всем отделам на предстоящий финансовый год."},
+{en:"exquisite",meaning:"extremely beautiful and delicate; showing great refinement",ru:"изысканный, утончённый",ex_en:"B1: The jewelry was absolutely exquisite. — Украшения были абсолютно изысканными.",ex_ru:"B2: The museum's collection includes exquisite examples of Ming Dynasty porcelain, each piece demonstrating exceptional craftsmanship. — Коллекция музея включает изысканные образцы фарфора династии Мин, каждое изделие демонстрирует исключительное мастерство."},
+{en:"hostage",meaning:"a person held by captors to force others to comply with demands",ru:"заложник",ex_en:"B1: The criminals took three people hostage. — Преступники взяли трёх человек в заложники.",ex_ru:"B2: The tense hostage situation lasted for twelve hours before negotiators successfully secured the safe release of all captives. — Напряжённая ситуация с заложниками продолжалась двенадцать часов, прежде чем переговорщикам удалось обеспечить безопасное освобождение всех пленников."},
+{en:"occur to someone (occur – occurred – occurred)",meaning:"(of a thought or idea) to come into someone's mind",ru:"прийти в голову кому-то",ex_en:"B1: It just occurred to me that I forgot my keys. — Мне только что пришло в голову, что я забыл ключи.",ex_ru:"B2: It never occurred to her that her colleague might be deliberately sabotaging the project until evidence emerged. — Ей никогда не приходило в голову, что её коллега может намеренно саботировать проект, пока не появились доказательства."},
+{en:"way ahead of someone",meaning:"much more advanced or further along than someone else",ru:"намного впереди кого-то",ex_en:"B1: She's way ahead of the other students in math. — Она намного опережает других студентов по математике.",ex_ru:"B2: The company was way ahead of its competitors in adopting artificial intelligence, giving it a significant strategic advantage in the market. — Компания намного опережала своих конкурентов в применении искусственного интеллекта, что дало ей значительное стратегическое преимущество на рынке."},
+{en:"swamp",meaning:"an area of soft, wet land with water and plants; to overwhelm with too much of something",ru:"болото; заваливать, переполнять",ex_en:"B1: We got lost in the swamp. — Мы заблудились в болоте.",ex_ru:"B2: After the product launch, customer service was swamped with inquiries and couldn't keep up with the overwhelming demand. — После запуска продукта служба поддержки клиентов была завалена запросами и не могла справиться с огромным спросом."},
+{en:"ominous",meaning:"giving the impression that something bad is going to happen; threatening",ru:"зловещий, предвещающий беду",ex_en:"B1: The dark clouds looked ominous. — Тёмные облака выглядели зловеще.",ex_ru:"B2: The CEO's ominous warning about upcoming restructuring left employees anxious and uncertain about their job security. — Зловещее предупреждение генерального директора о предстоящей реструктуризации оставило сотрудников встревоженными и неуверенными в своей работе."},
+{en:"nicer",meaning:"comparative form of \"nice\" = more pleasant, attractive, or kind",ru:"приятнее, лучше, добрее",ex_en:"B1: This apartment is nicer than the last one. — Эта квартира лучше, чем прошлая.",ex_ru:"B2: After receiving critical feedback, he made a conscious effort to be nicer to his colleagues and create a more positive work atmosphere. — После получения критических отзывов он сознательно старался быть добрее к коллегам и создать более позитивную рабочую атмосферу"},
+{en:"except for someone",meaning:"not including; apart from",ru:"кроме кого-то, за исключением",ex_en:"B1: Everyone was there except for John. — Все были там, кроме Джона.",ex_ru:"B2: The project proceeded smoothly except for one team member who consistently missed deadlines and disrupted the workflow. — Проект продвигался гладко, за исключением одного члена команды, который постоянно пропускал сроки и нарушал рабочий процесс."},
+{en:"sacred",meaning:"connected with God or a deity; regarded with great respect",ru:"священный, святой",ex_en:"B1: This is a sacred temple. — Это священный храм.",ex_ru:"B2: The indigenous community considers the ancient forest sacred and has fought to protect it from commercial development for generations. — Коренное сообщество считает древний лес священным и борется за его защиту от коммерческой застройки на протяжении поколений."},
+{en:"chatty",meaning:"fond of talking in a friendly and informal way",ru:"разговорчивый, болтливый",ex_en:"B1: My neighbor is very chatty — she can talk for hours! — Моя соседка очень разговорчивая — она может говорить часами!",ex_ru:"B2: While most participants remained formal during the conference call, one particularly chatty attendee dominated the conversation with personal anecdotes. — Хотя большинство участников оставались формальными во время конференц-звонка, один особенно разговорчивый участник доминировал в разговоре личными историями."},
+{en:"kin",meaning:"one's family and relations; relatives",ru:"родня, родственники",ex_en:"B1: She's visiting her kin this weekend. — Она навещает родню в эти выходные.",ex_ru:"B2: In many traditional societies, loyalty to one's kin takes precedence over individual ambitions and personal relationships. — Во многих традиционных обществах лояльность к своей родне имеет приоритет над личными амбициями и отношениями."},
+{en:"greasy",meaning:"covered with or resembling grease or oil; slippery",ru:"жирный, масляный",ex_en:"B1: This pizza is too greasy for me. — Эта пицца слишком жирная для меня.",ex_ru:"B2: The mechanic's hands were greasy from working on engines all day, and he had to scrub them thoroughly before heading home. — Руки механика были жирными после целого дня работы с двигателями, и ему пришлось тщательно их отмыть перед тем, как отправиться домой."},
+{en:"so long as / as long as",meaning:"provided that; on the condition that",ru:"при условии что, пока, до тех пор пока",ex_en:"B1: You can borrow my car so long as you drive carefully. — Ты можешь взять мою машину при условии, что будешь водить осторожно.",ex_ru:"B2: The company will continue to support remote work so long as employees maintain productivity and attend mandatory meetings. — Компания продолжит поддерживать удалённую работу при условии, что сотрудники сохранят продуктивность и будут посещать обязательные встречи."},
+{en:"someone is up to something",meaning:"planning or doing something (often something secretive or mischievous)",ru:"кто-то что-то замышляет",ex_en:"B1: I think he's up to something — he's acting strange. — Я думаю, он что-то замышляет — он ведёт себя странно.",ex_ru:"B2: When the kids suddenly became quiet upstairs, their mother immediately suspected they were up to something and went to investigate. — Когда дети внезапно стали тихими наверху, их мать сразу заподозрила, что они что-то замышляют, и пошла проверить."},
+{en:"porcelain",meaning:"a white, hard, translucent ceramic material; fine china",ru:"фарфор",ex_en:"B1: This vase is made of porcelain. — Эта ваза сделана из фарфора.",ex_ru:"B2: The museum's collection includes exquisite examples of Ming Dynasty porcelain, renowned for its delicate craftsmanship and vibrant glazes. — Коллекция музея включает изысканные образцы фарфора династии Мин, известного своим изящным мастерством и яркими глазурями."},
+{en:"dethrone (dethrone – dethroned – dethroned)",meaning:"to remove from power or position of authority; to depose",ru:"свергнуть с престола, лишить власти",ex_en:"B1: The king was dethroned after the revolution. — Король был свергнут после революции.",ex_ru:"B2: The young challenger managed to dethrone the reigning champion in a stunning upset that shocked the entire sports world. — Молодому претенденту удалось свергнуть действующего чемпиона в ошеломляющей сенсации, которая потрясла весь спортивный мир."},
+{en:"from now on",meaning:"starting from this moment and continuing into the future",ru:"с этого момента, отныне",ex_en:"B1: From now on, I'll study harder. — С этого момента я буду учиться усерднее.",ex_ru:"B2: After the security breach, the company announced that from now on, all employees must use two-factor authentication to access systems. — После утечки данных компания объявила, что отныне все сотрудники должны использовать двухфакторную аутентификацию для доступа к системам."},
+{en:"unfried dough",meaning:"unfried dough",ru:"нежареное тесто, сырое тесто",ex_en:"B1: Don't eat the unfried dough — it's not ready yet. — Не ешь сырое тесто — оно ещё не готово.",ex_ru:"B2: The recipe calls for letting the unfried dough rest for at least an hour before cooking to allow the gluten to relax. — Рецепт требует, чтобы нежареное тесто отдохнуло как минимум час перед готовкой, чтобы позволить глютену расслабиться."},
+{en:"pricey",meaning:"expensive; costing a lot of money (informal)",ru:"дорогой, дорогостоящий",ex_en:"B1: That restaurant is a bit pricey. — Тот ресторан немного дороговат.",ex_ru:"B2: While the boutique hotel was undeniably pricey, the exceptional service and stunning ocean views made it worth the splurge. — Хотя бутик-отель был, несомненно, дорогим, исключительное обслуживание и потрясающие виды на океан оправдали эту трату."},
+{en:"none of your business",meaning:"something that doesn't concern you; not your concern (can be rude)",ru:"не твоё дело",ex_en:"B1: Where I go on weekends is none of your business. — Куда я хожу на выходных — не твоё дело.",ex_ru:"B2: When the nosy colleague asked about her salary, she politely but firmly replied that it was none of his business. — Когда любопытный коллега спросил о её зарплате, она вежливо, но твёрдо ответила, что это не его дело."},
+{en:"pebble",meaning:"a small, smooth stone, especially one worn by water",ru:"галька, камешек",ex_en:"B1: Children were throwing pebbles into the lake. — Дети бросали камешки в озеро.",ex_ru:"B2: The garden path was beautifully designed with white pebbles arranged in intricate patterns between the stepping stones. — Садовая дорожка была красиво оформлена белой галькой, выложенной в замысловатые узоры между камнями для ходьбы."},
+{en:"get/keep one's eye on someone",meaning:"to watch someone carefully; to monitor",ru:"приглядывать за кем-то, следить за кем-то",ex_en:"B1: Can you keep your eye on my bag while I'm gone? — Можешь присмотреть за моей сумкой, пока меня нет?",ex_ru:"B2: The manager asked the senior employee to keep an eye on the new intern and make sure she understood the company procedures. — Менеджер попросил старшего сотрудника присмотреть за новой стажёркой и убедиться, что она понимает процедуры компании."},
+{en:"twinkle toes",meaning:"someone who is light on their feet; a good dancer (often used playfully or sarcastically)",ru:"лёгкий на ногу; хороший танцор (игривое прозвище)",ex_en:"B1: Look at twinkle toes over there dancing! — Посмотри на этого танцора, как он танцует!",ex_ru:"B2: Despite his large build, he moved across the dance floor with surprising grace, earning him the nickname \"twinkle toes\" from his friends. — Несмотря на крупное телосложение, он двигался по танцполу с удивительной грацией, что принесло ему прозвище «лёгкий на ногу» от друзей."},
+{en:"let's call a truce",meaning:"let's agree to stop fighting or arguing; make peace temporarily",ru:"давай заключим перемирие, давай помиримся",ex_en:"B1: We've been arguing all day — let's call a truce. — Мы спорим весь день — давай заключим перемирие.",ex_ru:"B2: After weeks of heated debates, the two departments finally agreed to call a truce and work together on the project. — После недель жарких дебатов два отдела наконец согласились заключить перемирие и работать вместе над проектом."},
+{en:"fragile",meaning:"easily broken or damaged; delicate",ru:"хрупкий, ломкий",ex_en:"B1: Be careful — this glass is very fragile. — Будь осторожен — это стекло очень хрупкое.",ex_ru:"B2: The ancient manuscript was so fragile that museum curators could only handle it while wearing special gloves in controlled conditions. — Древняя рукопись была настолько хрупкой, что кураторы музея могли обращаться с ней только в специальных перчатках в контролируемых условиях."},
+{en:"speaking of which",meaning:"used to introduce a related topic that was just mentioned",ru:"кстати о том; кстати говоря",ex_en:"B1: I need to buy groceries. Speaking of which, did you make a shopping list? — Мне нужно купить продукты. Кстати, ты составил список покупок?",ex_ru:"B2: The meeting went well, and we finalized the budget. Speaking of which, have you received approval from the finance department yet? — Встреча прошла хорошо, и мы утвердили бюджет. Кстати говоря, ты уже получил одобрение от финансового отдела?"},
+{en:"we are even / we're even",meaning:"neither person owes the other anything; the score is settled",ru:"мы квиты, мы в расчёте",ex_en:"B1: You helped me yesterday, I helped you today — now we're even. — Ты помог мне вчера, я помог тебе сегодня — теперь мы квиты.",ex_ru:"B2: After she returned the favor by covering his shift, he smiled and said, \"I guess we're even now,\" acknowledging their mutual support. — После того как она ответила услугой, заменив его на смене, он улыбнулся и сказал: «Думаю, теперь мы квиты», признавая их взаимную поддержку."},
+{en:"whereabouts",meaning:"the place where someone or something is",ru:"местонахождение",ex_en:"Do you know his whereabouts?",ex_ru:"Ты знаешь, где он находится?"},
+{en:"go way back",meaning:"to have a long history together",ru:"знать друг друга давно",ex_en:"We go way back to school days.",ex_ru:"Мы знакомы ещё со школы."},
+{en:"step in",meaning:"to get involved to help",ru:"вмешаться",ex_en:"She stepped in to solve the problem.",ex_ru:"Она вмешалась, чтобы решить проблему."},
+{en:"to be on the house",meaning:"free of charge",ru:"за счёт заведения",ex_en:"Don’t worry, drinks are on the house.",ex_ru:"Не переживай, напитки за счёт заведения."},
+{en:"fabulous",meaning:"extremely good",ru:"потрясающий",ex_en:"That was a fabulous performance.",ex_ru:"Это было потрясающее выступление."},
+{en:"I am not quite following",meaning:"I don’t fully understand",ru:"я не совсем понимаю",ex_en:"I’m not quite following your point.",ex_ru:"Я не совсем понимаю твою мысль."},
+{en:"think over",meaning:"consider carefully",ru:"обдумать",ex_en:"I need time to think it over.",ex_ru:"Мне нужно время, чтобы всё обдумать"},
+{en:"point out",meaning:"draw attention to",ru:"указать",ex_en:"She pointed out my mistake.",ex_ru:"Она указала на мою ошибку."},
+{en:"point at",meaning:"direct finger toward",ru:"указывать на (физически)",ex_en:"Don’t point at people.",ex_ru:"Не указывай на людей."},
+{en:"count on / rely on / bank on",meaning:"depend on",ru:"полагаться",ex_en:"You can rely on me.",ex_ru:"Ты можешь на меня рассчитывать."},
+{en:"get by",meaning:"manage with difficulty",ru:"справляться",ex_en:"We can get by with little money.",ex_ru:"Мы можем справиться с небольшими деньгами."},
+{en:"make up / come up with",meaning:"invent ideas",ru:"придумывать",ex_en:"She came up with a solution.",ex_ru:"Она придумала решение."},
+{en:"make up a story",meaning:"invent a story",ru:"сочинить историю",ex_en:"He made up a story to explain.",ex_ru:"Он придумал историю, чтобы объяснить."},
+{en:"get away",meaning:"escape",ru:"сбежать / уйти",ex_en:"He got away from the police.",ex_ru:"Он сбежал от полиции."},
+{en:"put forward",meaning:"propose",ru:"выдвигать (идею)",ex_en:"They put forward a new plan.",ex_ru:"Они выдвинули новый план."},
+{en:"suggestion",meaning:"an idea or advice",ru:"предложение",ex_en:"That’s a good suggestion.",ex_ru:"Это хорошее предложение."},
+{en:"put out (the fire)",meaning:"extinguish",ru:"потушить",ex_en:"Firefighters put out the fire.",ex_ru:"Пожарные потушили огонь."},
+{en:"figure out",meaning:"understand or solve",ru:"разобраться",ex_en:"I can’t figure it out.",ex_ru:"Я не могу разобраться."},
+{en:"carry out / conduct",meaning:"perform",ru:"выполнять, проводить",ex_en:"They carried out the experiment.",ex_ru:"Они провели эксперимент."},
+{en:"give away",meaning:"give for free or reveal",ru:"раздавать / выдавать",ex_en:"They gave away free food.",ex_ru:"Они раздавали бесплатную еду."},
+{en:"charity",meaning:"helping others",ru:"благотворительность",ex_en:"She works for a charity.",ex_ru:"Она работает в благотворительной организации."},
+{en:"pick up",meaning:"lift, collect, improve",ru:"подбирать / забирать / улучшать",ex_en:"I’ll pick you up at 6.",ex_ru:"Я заеду за тобой в 6"},
+{en:"cut down on",meaning:"reduce",ru:"сократить",ex_en:"I need to cut down on sugar.",ex_ru:"Мне нужно сократить сахар."},
+{en:"find out",meaning:"discover",ru:"узнать",ex_en:"Find out the truth.",ex_ru:"Узнай правду."},
+{en:"come in",meaning:"enter",ru:"войти",ex_en:"Come in, please.",ex_ru:"Заходи."},
+{en:"look in on someone",meaning:"visit briefly",ru:"проведать",ex_en:"I’ll look in on my grandma.",ex_ru:"Я зайду проведать бабушку."},
+{en:"take after / resemble",meaning:"look like",ru:"быть похожим",ex_en:"He takes after his father.",ex_ru:"Он похож на своего отца."},
+{en:"look after",meaning:"take care of",ru:"заботиться",ex_en:"She looks after the kids.",ex_ru:"Она заботится о детях"},
+{en:"go by",meaning:"pass",ru:"проходить (о времени)",ex_en:"Time goes by quickly.",ex_ru:"Время проходит быстро."},
+{en:"put up (the price)",meaning:"increase price",ru:"повысить цену",ex_en:"They put up the price.",ex_ru:"Они повысили цену."},
+{en:"put up with / tolerate / endure",meaning:"accept something unpleasant",ru:"терпеть",ex_en:"I can’t put up with this noise.",ex_ru:"Я не могу терпеть этот шум"},
+{en:"go down",meaning:"decrease",ru:"падать",ex_en:"Prices go down.",ex_ru:"Цены падают."},
+{en:"go up",meaning:"increase",ru:"расти",ex_en:"Prices go up.",ex_ru:"Цены растут."},
+{en:"talk over",meaning:"discuss",ru:"обсудить",ex_en:"Let’s talk it over.",ex_ru:"Давай это обсудим."},
+{en:"take off",meaning:"remove or rise",ru:"взлететь / снять / стать популярным",ex_en:"The plane took off.",ex_ru:"Самолёт взлетел."},
+{en:"drop out of",meaning:"quit",ru:"бросить (учёбу)",ex_en:"He dropped out of college.",ex_ru:"Он бросил колледж."},
+{en:"let someone down",meaning:"disappoint",ru:"подвести",ex_en:"Don’t let me down.",ex_ru:"Не подведи меня."},
+{en:"go off",meaning:"explode, ring, spoil",ru:"сработать / испортиться / уйти",ex_en:"The alarm went off.",ex_ru:"Сработала сигнализация."},
+{en:"put off",meaning:"delay",ru:"откладывать",ex_en:"Don’t put it off.",ex_ru:"Не откладывай."},
+{en:"get back to doing something",meaning:"resume",ru:"вернуться к",ex_en:"I got back to studying.",ex_ru:"Я вернулся к учёбе."},
+{en:"get across",meaning:"communicate clearly",ru:"донести мысль",ex_en:"He got his point across.",ex_ru:"Он донёс свою мысль."},
+{en:"look ahead",meaning:"think about future",ru:"смотреть вперёд",ex_en:"We must look ahead.",ex_ru:"Нужно смотреть вперёд."},
+{en:"look back",meaning:"think about past",ru:"оглядываться назад",ex_en:"Don’t look back with regret.",ex_ru:"Не оглядывайся с сожалением."},
+{en:"fall behind",meaning:"lag behind",ru:"отставать",ex_en:"He fell behind in class.",ex_ru:"Он начал отставать в классе."},
+{en:"look through",meaning:"examine quickly",ru:"просмотреть",ex_en:"I looked through the documents.",ex_ru:"Я просмотрел документы"},
+{en:"fall out / quarrel",meaning:"argue",ru:"поссориться",ex_en:"They fell out over money.",ex_ru:"Они поссорились из-за денег."},
+{en:"bring up",meaning:"raise or mention",ru:"воспитывать / поднять тему",ex_en:"She brought up an important issue.",ex_ru:"Она подняла важный вопрос."},
+{en:"watch out",meaning:"be careful",ru:"будь осторожен",ex_en:"Watch out for cars.",ex_ru:"Осторожно с машинами."},
+{en:"look out",meaning:"warning",ru:"осторожно",ex_en:"Look out!",ex_ru:"Осторожно!"},
+{en:"gain",meaning:"to obtain or achieve",ru:"получать, приобретать",ex_en:"He gained valuable experience from the job.",ex_ru:"Он получил ценный опыт от работы."},
+{en:"to be lucky to be born",meaning:"to feel fortunate about being born or life circumstances",ru:"повезло родиться",ex_en:"I feel lucky to be born into this family.",ex_ru:"Мне повезло родиться в этой семье."},
+{en:"rat someone out",meaning:"to inform on someone",ru:"сдать, настучать",ex_en:"He ratted me out to the teacher.",ex_ru:"Он сдал меня учителю."},
+{en:"n the barn / on the barn",meaning:"related to a farm building",ru:"в амбаре / на амбаре",ex_en:"They stored hay in the barn.",ex_ru:"Они хранили сено в амбаре."},
+{en:"keep in mind",meaning:"remember or consider",ru:"иметь в виду",ex_en:"Keep in mind that time is limited.",ex_ru:"Имей в виду, что время ограничено."},
+{en:"quieter",meaning:"more quiet",ru:"тише / более тихий",ex_en:"Please be quieter.",ex_ru:"Пожалуйста, будь тише."},
+{en:"downwind",meaning:"in the direction the wind is blowing",ru:"по ветру",ex_en:"The smell carried downwind.",ex_ru:"Запах разнёсся по ветру."},
+{en:"prodigy",meaning:"a person with exceptional talent",ru:"вундеркинд",ex_en:"He was a child prodigy in music.",ex_ru:"Он был музыкальным вундеркиндом."},
+{en:"revoke",meaning:"officially cancel",ru:"аннулировать, отменять",ex_en:"They revoked his license.",ex_ru:"Ему аннулировали лицензию."},
+{en:"humble servant",meaning:"respectful and modest helper",ru:"покорный слуга",ex_en:"I remain your humble servant.",ex_ru:"Остаюсь вашим покорным слугой."},
+{en:"scarcely",meaning:"barely",ru:"едва, почти не",ex_en:"He could scarcely believe it.",ex_ru:"Он едва мог в это поверить."},
+{en:"hail",meaning:"greet enthusiastically or frozen rain",ru:"приветствовать / град",ex_en:"They hailed the hero.",ex_ru:"Они приветствовали героя."},
+{en:"elude",meaning:"escape or avoid",ru:"ускользать",ex_en:"The answer eluded him.",ex_ru:"Ответ ускользал от него."},
+{en:"evoke",meaning:"to bring to mind",ru:"вызывать (чувства)",ex_en:"The music evoked strong emotions.",ex_ru:"Музыка вызвала сильные эмоции."},
+{en:"divide up",meaning:"split into parts",ru:"разделить",ex_en:"They divided up the work equally.",ex_ru:"Они разделили работу поровну."},
+{en:"avalanche",meaning:"a large mass of snow falling down",ru:"лавина",ex_en:"The avalanche blocked the road.",ex_ru:"Лавина перекрыла дорогу."},
+{en:"help unload",meaning:"assist in taking things off",ru:"помочь разгрузить",ex_en:"Can you help unload the truck?",ex_ru:"Можешь помочь разгрузить грузовик?"},
+{en:"carry one’s own weight",meaning:"do your fair share",ru:"делать свою часть работы",ex_en:"Everyone must carry their own weight.",ex_ru:"Каждый должен выполнять свою часть работы."},
+{en:"sugar queen",meaning:"someone who loves sweets",ru:"сладкоежка / любитель сладкого",ex_en:"She’s a real sugar queen.",ex_ru:"Она настоящая любительница сладкого"},
+{en:"I can see that",meaning:"I understand or notice",ru:"я это вижу / понимаю",ex_en:"I can see that you’re upset.",ex_ru:"Я вижу, что ты расстроен."},
+{en:"tuck someone in (bed)",meaning:"make someone comfortable in bed",ru:"укладывать спать",ex_en:"She tucked the child in bed.",ex_ru:"Она уложила ребёнка спать."},
+{en:"perky",meaning:"lively and cheerful",ru:"бодрый, энергичный",ex_en:"She is always so perky in the morning.",ex_ru:"Она всегда такая бодрая утром."},
+{en:"buddy",meaning:"a friend",ru:"приятель",ex_en:"Hey buddy, how are you?",ex_ru:"Привет, приятель, как дела?"},
+{en:"tailbone",meaning:"the small bone at the base of the spine",ru:"копчик",ex_en:"He hurt his tailbone.",ex_ru:"Он повредил копчик."},
+{en:"clumps",meaning:"small thick groups",ru:"комки, сгустки",ex_en:"There were clumps of dirt on his shoes.",ex_ru:"На его обуви были комки грязи."},
+{en:"how you doing",meaning:"informal greeting",ru:"как дела (разговорное)",ex_en:"Hey, how you doing?",ex_ru:"Привет, как дела?"},
+{en:"so what now",meaning:"asking what to do next",ru:"и что теперь",ex_en:"So what now, what’s the plan?",ex_ru:"И что теперь, какой план?"},
+{en:"pour",meaning:"to make liquid flow",ru:"наливать",ex_en:"She poured some water into the glass.",ex_ru:"Она налила воду в стакан."},
+{en:"mutual",meaning:"shared by two or more people",ru:"взаимный",ex_en:"They have mutual respect for each other.",ex_ru:"У них взаимное уважение."},
+{en:"attend",meaning:"to be present at an event",ru:"посещать",ex_en:"She attends all the meetings.",ex_ru:"Она посещает все встречи."},
+{en:"mandatory",meaning:"required by rules",ru:"обязательный",ex_en:"Attendance is mandatory.",ex_ru:"Посещение обязательно."},
+{en:"estate",meaning:"property or land",ru:"имущество / поместье",ex_en:"He owns a large estate.",ex_ru:"У него есть большое поместье."},
+{en:"confidant",meaning:"a person you trust with secrets",ru:"доверенное лицо",ex_en:"She is my closest confidant.",ex_ru:"Она моё самое доверенное лицо."},
+{en:"household",meaning:"people living in one home",ru:"домохозяйство",ex_en:"The whole household was asleep.",ex_ru:"Всё домохозяйство спало."},
+{en:"splurge",meaning:"spend a lot of money",ru:"тратиться, шикануть",ex_en:"He splurged on a new phone.",ex_ru:"Он потратился на новый телефон."},
+{en:"despair",meaning:"complete loss of hope",ru:"отчаяние",ex_en:"He felt despair after the failure.",ex_ru:"Он почувствовал отчаяние после неудачи."},
+{en:"snooze",meaning:"to sleep lightly for a short time",ru:"дремать",ex_en:"He snoozed on the couch.",ex_ru:"Он задремал на диване."},
+{en:"bracing",meaning:"refreshing or harsh",ru:"бодрящий / резкий",ex_en:"The cold wind was bracing.",ex_ru:"Холодный ветер был бодрящим."},
+{en:"resume something",meaning:"start again after a pause",ru:"возобновить",ex_en:"They resumed work after lunch.",ex_ru:"Они возобновили работу после обеда."},
+{en:"head-on",meaning:"directly or frontally",ru:"напрямую / лоб в лоб",ex_en:"They faced the problem head-on.",ex_ru:"Они столкнулись с проблемой напрямую."},
+{en:"gentle nudge",meaning:"slight push or encouragement",ru:"мягкий толчок / намёк",ex_en:"She gave him a gentle nudge to speak.",ex_ru:"Она мягко подтолкнула его заговорить."},
+{en:"collide",meaning:"crash into something",ru:"сталкиваться",ex_en:"The cars collided on the road.",ex_ru:"Машины столкнулись на дороге."},
+{en:"awfully cute",meaning:"extremely cute",ru:"очень милый",ex_en:"That puppy is awfully cute.",ex_ru:"Этот щенок очень милый."},
+{en:"separate",meaning:"divide or be apart",ru:"разделять / отдельный",ex_en:"They decided to separate.",ex_ru:"Они решили разойтись."},
+{en:"humble guide",meaning:"modest helper",ru:"скромный проводник",ex_en:"I will be your humble guide today.",ex_ru:"Сегодня я буду вашим скромным проводником."},
+{en:"get your horse stance",meaning:"take a stable stance",ru:"встань в стойку (боевые искусства)",ex_en:"Get your horse stance before training.",ex_ru:"Прими стойку перед тренировкой."},
+{en:"blew",meaning:"past of blow",ru:"дул / взорвал (прошедшее от blow)",ex_en:"The wind blew all night.",ex_ru:"Ветер дул всю ночь."},
+{en:"turmoil",meaning:"confusion or disorder",ru:"смятение, хаос",ex_en:"The country was in turmoil.",ex_ru:"Страна была в хаосе."},
+{en:"work out that way",meaning:"happened in that way",ru:"так получилось",ex_en:"It just worked out that way.",ex_ru:"Так просто получилось."},
+{en:"pay off",meaning:"bring good results",ru:"окупаться",ex_en:"Hard work pays off.",ex_ru:"Тяжёлый труд окупается."},
+{en:"substance",meaning:"material or essence",ru:"суть / вещество",ex_en:"Focus on the substance, not style.",ex_ru:"Сосредоточься на сути, а не на форме."},
+{en:"enduring / persisting",meaning:"lasting or continuing",ru:"стойкий / продолжающийся",ex_en:"She showed enduring strength.",ex_ru:"Она проявила стойкую силу."},
+{en:"vast ocean",meaning:"very large sea",ru:"огромный океан",ex_en:"They crossed a vast ocean.",ex_ru:"Они пересекли огромный океан."},
+{en:"detour",meaning:"alternative route",ru:"обходной путь",ex_en:"We took a detour.",ex_ru:"Мы поехали в объезд."},
+{en:"held back",meaning:"prevented or restrained",ru:"сдерживал / задерживал",ex_en:"He held back his emotions.",ex_ru:"Он сдерживал свои эмоции"},
+{en:"vacation",meaning:"a period of rest or travel",ru:"отпуск",ex_en:"We are going on vacation next week.",ex_ru:"Мы едем в отпуск на следующей неделе"},
+{en:"pristine",meaning:"in perfect original condition",ru:"первозданный, безупречный",ex_en:"The beach was pristine and untouched.",ex_ru:"Пляж был первозданным и нетронутым"},
+{en:"priceless",meaning:"extremely valuable, not measurable in money",ru:"бесценный",ex_en:"Her support is priceless.",ex_ru:"Её поддержка бесценна."},
+{en:"shutty",meaning:"closed or not open",ru:"(нечасто используется; лучше: shut / closed) — закрытый",ex_en:"The shop was shut early.",ex_ru:"Магазин закрылся рано."},
+{en:"buried",meaning:"placed under ground",ru:"похороненный / закопанный",ex_en:"The treasure was buried underground.",ex_ru:"Сокровище было закопано под землёй."},
+{en:"intact",meaning:"not damaged",ru:"нетронутый, целый",ex_en:"The building remained intact.",ex_ru:"Здание осталось целым."},
+{en:"vouch",meaning:"to guarantee or support",ru:"поручиться",ex_en:"I can vouch for his honesty.",ex_ru:"Я могу поручиться за его честность."},
+{en:"fuzzy",meaning:"unclear or soft",ru:"нечёткий / пушистый",ex_en:"The picture is fuzzy.",ex_ru:"Картинка нечёткая."},
+{en:"misuse",meaning:"use in the wrong way",ru:"неправильно использовать",ex_en:"Don’t misuse this tool.",ex_ru:"Не используй этот инструмент неправильно."},
+{en:"snuggle",meaning:"to cuddle closely",ru:"прижиматься",ex_en:"They snuggled under the blanket.",ex_ru:"Они прижались друг к другу под одеялом."},
+{en:"sneak up on smb",meaning:"to approach someone silently without them noticing",ru:"подкрадываться к кому-либо",ex_en:"The cat snuck up on the bird.",ex_ru:"Кот подкрался к птице."},
+{en:"apprehend",meaning:"to arrest or capture someone; also: to understand or fear something",ru:"задерживать, арестовывать (официально)",ex_en:"Police apprehended the suspect near the border.",ex_ru:"Полиция задержала подозреваемого у границы."},
+{en:"fugitive",meaning:"a person who has escaped and is hiding from the law",ru:"беглец, беглый преступник",ex_en:"They were hunting fugitives across three states.",ex_ru:"Они преследовали беглецов в трёх штатах."},
+{en:"swampy",meaning:"wet, muddy, like a swamp",ru:"болотистый, топкий",ex_en:"The swampy ground made it hard to walk.",ex_ru:"Болотистая почва мешала идти."},
+{en:"suit yourself",meaning:"do whatever you want — said when you don't care or are slightly annoyed",ru:"как хочешь, как знаешь",ex_en:"\"I'm not coming.\" — \"Suit yourself.\"",ex_ru:"«Я не пойду.» — «Как хочешь.»"},
+{en:"quench",meaning:"to satisfy thirst or desire; to extinguish a fire",ru:"утолять (жажду), гасить (огонь, желание)",ex_en:"Nothing could quench his thirst in that heat.",ex_ru:"Ничто не могло утолить его жажду в такую жару."},
+{en:"rat smb out",meaning:"to inform on someone, to betray them by telling authorities",ru:"доносить на кого-то, сдавать (предавать)",ex_en:"He ratted his friends out to the police.",ex_ru:"Он сдал своих друзей полиции."},
+{en:"filthy",meaning:"extremely dirty; also used to mean morally disgusting",ru:"грязный (очень), мерзкий",ex_en:"The streets were filthy after the festival.",ex_ru:"Улицы были ужасно грязными после фестиваля."},
+{en:"gasbag",meaning:"US: an old man (slightly dismissive); UK: just a guy / bloke",ru:"старикан (разг.), дядька (брит. сленг — просто «мужик»)",ex_en:"Some old geezer was feeding pigeons in the park.",ex_ru:"Какой-то старикан кормил голубей в парке."},
+{en:"mud",meaning:"wet, soft earth or dirt",ru:"грязь, жижа (мокрая земля)",ex_en:"",ex_ru:""},
+{en:"woozy",meaning:"feeling dizzy, unsteady, or slightly faint — from alcohol, illness, or a blow",ru:"головокружение, «поплыло» (чувствуешь себя неустойчиво)",ex_en:"I felt woozy after standing up too fast.",ex_ru:"У меня поплыло в голове, когда я резко встал."},
+{en:"hallucinate",meaning:"to see, hear, or sense things that aren't really there",ru:"галлюцинировать, видеть галлюцинации",ex_en:"The fever was so high he started hallucinating.",ex_ru:"Температура была такой высокой, что у него начались галлюцинации."},
+{en:"carve",meaning:"to cut into a material to shape it; also to slice meat at the table",ru:"вырезать, резать (из дерева, камня, мяса)",ex_en:"He carved a bear out of a log.",ex_ru:"Он вырезал медведя из бревна."},
+{en:"merchant",meaning:"a person who buys and sells goods, especially in trade; also used in fantasy/historical contexts",ru:"торговец, купец",ex_en:"Medieval merchants traveled long routes to sell their goods.",ex_ru:"Средневековые купцы преодолевали долгий путь, чтобы продать товары."},
+{en:"destructive",meaning:"causing great damage or harm",ru:"разрушительный, губительный",ex_en:"The storm was the most destructive in decades.",ex_ru:"Буря была самой разрушительной за десятилетия."},
+{en:"penetrate",meaning:"to pass into or through something, especially something solid or defended",ru:"проникать, пробиваться сквозь что-либо",ex_en:"The bullet failed to penetrate the armor.",ex_ru:"Пуля не смогла пробить броню."},
+{en:"expunge",meaning:"to erase or remove something completely, especially from a record",ru:"стирать, вычёркивать, полностью уничтожать (запись, память)",ex_en:"His criminal record was expunged after ten years.",ex_ru:"Его судимость была аннулирована через десять лет."},
+{en:"impenetrable",meaning:"impossible to pass through or understand; also used for dense text or logic",ru:"непроницаемый, непробиваемый; непонятный",ex_en:"The fortress walls were impenetrable.",ex_ru:"Стены крепости были непробиваемыми."},
+{en:"drill",meaning:"to make a hole with a tool; to train soldiers repeatedly; a practice session",ru:"сверлить (инструмент) / муштровать, тренировать (военн.) / учения, тренировка",ex_en:"The sergeant drilled the recruits every morning.",ex_ru:"Сержант муштровал новобранцев каждое утро."},
+{en:"elite platoon",meaning:"a highly trained, specially selected small military unit",ru:"элитный взвод",ex_en:"An elite platoon was sent in to complete the mission.",ex_ru:"Для выполнения задания был направлен элитный взвод."},
+{en:"doomed",meaning:"certain to fail, die, or suffer — no way out",ru:"обречённый (на провал, гибель)",ex_en:"From the start, the mission felt doomed.",ex_ru:"С самого начала миссия казалась обречённой."},
+{en:"get a hold of oneself",meaning:"to regain control of your emotions; to stop panicking or acting irrationally",ru:"взять себя в руки, успокоиться",ex_en:"He took a deep breath and got a hold of himself.",ex_ru:"Он глубоко вздохнул и взял себя в руки."},
+{en:"flower in bloom",meaning:"a flower that has fully opened; often used metaphorically for beauty or peak condition",ru:"цветок в расцвете, распустившийся цветок",ex_en:"The garden was full of flowers in bloom.",ex_ru:"Сад был полон распустившихся цветов."},
+{en:"cartwheeled",meaning:"a sideways gymnastics move where you spin on your hands and feet; also: to spin or tumble wildly",ru:"делать колесо (гимнастика) / колесо (как движение)",ex_en:"The car cartwheeled off the road and into the ditch.",ex_ru:"Машина перевернулась через колесо и вылетела в кювет."},
+{en:"bangable",meaning:"crude slang meaning sexually attractive — avoid in formal or polite contexts",ru:"привлекательный в сексуальном плане (грубо)",ex_en:"",ex_ru:""},
+{en:"elusive",meaning:"hard to find, catch, or achieve",ru:"неуловимый, труднодостижимый",ex_en:"Success remained elusive despite years of effort.",ex_ru:"Успех оставался недостижимым, несмотря на годы усилий."},
+{en:"complement",meaning:"to go well with something and make it complete (≠ compliment = похвала)",ru:"дополнять, хорошо сочетаться (глагол) / дополнение (сущ.)",ex_en:"The sauce complements the dish perfectly.",ex_ru:"Соус отлично дополняет блюдо."},
+{en:"deference",meaning:"respectful submission or yielding to someone else's judgment or wishes",ru:"уважение, почтение (особенно к старшим/авторитетам)",ex_en:"In deference to her wishes, they stayed quiet.",ex_ru:"Из уважения к её пожеланиям они помолчали."},
+{en:"deterrence",meaning:"the act of discouraging someone from doing something through fear of consequences",ru:"сдерживание, устрашение (чтобы предотвратить действие)",ex_en:"Nuclear deterrence kept the two powers from open conflict.",ex_ru:"Ядерное сдерживание уберегло две державы от открытого конфликта."},
+{en:"cogent",meaning:"clear, logical, and convincing (used for arguments)",ru:"убедительный, логически обоснованный",ex_en:"She made a cogent argument for changing the policy.",ex_ru:"Она привела убедительный аргумент в пользу изменения политики."},
+{en:"proliferate",meaning:"to increase rapidly in number or spread widely",ru:"стремительно распространяться, размножаться",ex_en:"Fake news proliferates quickly on social media.",ex_ru:"Фейковые новости быстро распространяются в соцсетях."},
+{en:"benevolent",meaning:"kind, generous, and well-meaning toward others",ru:"доброжелательный, благосклонный, великодушный",ex_en:"He was a benevolent ruler who cared for his people.",ex_ru:"Он был великодушным правителем, заботившимся о своём народе."},
+{en:"furtive",meaning:"done secretly, as if trying not to be noticed; shifty",ru:"украдкий, скрытный, подозрительно тихий",ex_en:"She shot a furtive glance over her shoulder.",ex_ru:"Она украдкой бросила взгляд через плечо."},
+{en:"diaphanous",meaning:"light, delicate, and almost transparent — usually of fabric or mist",ru:"прозрачный, лёгкий (о ткани, тумане)",ex_en:"She wore a diaphanous white veil.",ex_ru:"На ней была лёгкая, почти прозрачная белая вуаль."},
+{en:"shush",meaning:"to tell someone to be quiet; \"shush up\" = informal, slightly stronger",ru:"заткнись / тише! (просьба замолчать)",ex_en:"She shushed the kids during the movie.",ex_ru:"Она попросила детей замолчать во время фильма."},
+{en:"desperate",meaning:"feeling or showing hopelessness; willing to do anything due to urgency",ru:"отчаянный, безнадёжный; очень нуждающийся",ex_en:"He was desperate for any news about his family.",ex_ru:"Он отчаянно ждал любых новостей о своей семье."},
+{en:"ferry ride",meaning:"a trip across water on a ferry boat",ru:"поездка на пароме",ex_en:"The ferry ride to the island took about 20 minutes.",ex_ru:"Поездка на пароме до острова заняла около 20 минут."},
+{en:"liberate",meaning:"to set someone free from imprisonment, oppression, or constraint",ru:"освобождать (из плена, угнетения)",ex_en:"Allied forces liberated the city in 1944.",ex_ru:"Союзные войска освободили город в 1944 году."},
+{en:"on the ferry",meaning:"aboard a ferry boat",ru:"на пароме",ex_en:"We met on the ferry crossing the bay.",ex_ru:"Мы познакомились на пароме, пересекая залив."},
+{en:"imbecile",meaning:"a very stupid person — used as an insult; originally a medical term (now offensive)",ru:"идиот, тупица (оскорбление)",ex_en:"Those imbeciles broke the machine again.",ex_ru:"Эти тупицы снова сломали машину."},
+{en:"crabby",meaning:"irritable and grumpy, usually temporarily",ru:"раздражительный, сварливый, не в духе",ex_en:"He's always crabby before his morning coffee.",ex_ru:"Он всегда сварливый до утреннего кофе."},
+{en:"sleeveless",meaning:"a garment with no sleeves",ru:"без рукавов",ex_en:"She wore a sleeveless dress in the summer heat.",ex_ru:"В летнюю жару она надела платье без рукавов."},
+{en:"Are you doing okay?",meaning:"a caring question checking on someone's wellbeing — warmer than \"are you okay?\"",ru:"Ты в порядке? / Как ты?",ex_en:"\"You look tired — are you doing okay?\" \"Yeah, just a long day.\"",ex_ru:"«Ты выглядишь уставшим — ты в порядке?» «Да, просто длинный день.»"},
+{en:"belongings",meaning:"the things you own, especially things you carry with you",ru:"вещи, пожитки, личные предметы",ex_en:"She packed her belongings into one bag.",ex_ru:"Она сложила все свои вещи в одну сумку."},
+{en:"lead through",meaning:"to guide someone through a place or process",ru:"проводить через что-либо, вести сквозь",ex_en:"She led us through the narrow alleyways.",ex_ru:"Она провела нас через узкие переулки."},
+{en:"Thank you for your concern.",meaning:"a polite reply to someone who has expressed worry — can be sincere or slightly dismissive depending on tone",ru:"Спасибо за беспокойство / заботу.",ex_en:"\"You really should rest more.\" — \"Thank you for your concern.\"",ex_ru:"«Тебе правда нужно больше отдыхать.» — «Спасибо за беспокойство.»"},
+{en:"overprotective",meaning:"being too protective, not allowing enough freedom",ru:"чрезмерно опекающий, гиперопекающий",ex_en:"His overprotective parents wouldn't let him travel alone.",ex_ru:"Его гиперопекающие родители не давали ему путешествовать одному."},
+{en:"noble of smb",meaning:"said when someone does something morally admirable or self-sacrificing",ru:"благородно с чьей-то стороны",ex_en:"\"I'll cover for you.\" — \"That's noble of you.\"",ex_ru:"«Я тебя прикрою.» — «Это благородно с твоей стороны.»"},
+{en:"humble",meaning:"not arrogant; modest about one's abilities; as a verb: to make someone feel less proud",ru:"скромный, смиренный (прил.) / унижать, смирять (глагол)",ex_en:"Despite his fame, he remained humble.",ex_ru:"Несмотря на славу, он оставался скромным."},
+{en:"outcast",meaning:"a person rejected or excluded by society or a group",ru:"изгой, отверженный",ex_en:"He felt like an outcast in his new school.",ex_ru:"В новой школе он чувствовал себя изгоем."},
+{en:"squishy-looking",meaning:"appearing soft, squishy, or jelly-like in texture",ru:"выглядящий мягким и упругим, как желе",ex_en:"That squishy-looking mushroom was actually dangerous.",ex_ru:"Этот мягкий на вид гриб оказался опасным."},
+{en:"fuzzball",meaning:"a small fluffy creature or a ball of fluff — usually said affectionately about animals",ru:"пушистик, меховой комочек (ласково о животном)",ex_en:"Look at that little fuzzball — it's a baby hamster!",ex_ru:"Посмотри на этого пушистика — это же детёныш хомяка!"},
+{en:"whip up",meaning:"to make something quickly and easily; to beat eggs/cream; also: to stir up emotions",ru:"быстро приготовить / сделать на скорую руку; взбить (яйца, крем)",ex_en:"I'll whip up something to eat in ten minutes.",ex_ru:"Я за десять минут что-нибудь приготовлю."},
+{en:"poofy",meaning:"light and full of air; excessively fluffy or puffy in shape",ru:"пышный, надутый, пузырчатый (о форме)",ex_en:"She wore a poofy dress that took up half the seat.",ex_ru:"На ней было пышное платье, занявшее половину сиденья."},
+{en:"braces",meaning:"dental braces = metal brackets to straighten teeth; braces (UK) = suspenders for trousers",ru:"брекеты (зубные) / подтяжки (для брюк — брит.)",ex_en:"He had braces for two years and now his teeth are perfect.",ex_ru:"Он носил брекеты два года, и теперь у него идеальные зубы."},
+{en:"disgrace / deference / grace",meaning:"loss of respect or honour; a shameful situation\npolite respect shown to someone of higher status\nelegance of movement; also: kindness or goodwill (\"with good grace\")",ru:"позор, бесчестье\nпочтение, уважение к старшим / авторитетам\nизящество, грация; милость, благодать",ex_en:"His behaviour was a disgrace to the whole team.",ex_ru:"Его поведение было позором для всей команды."},
+{en:"have it your way",meaning:"do it the way you want — said when you disagree but give up arguing",ru:"как хочешь, пусть будет по-твоему (с лёгкой досадой)",ex_en:"\"I'm not changing my mind.\" — \"Fine, have it your way.\"",ex_ru:"«Я не изменю своего мнения.» — «Ладно, пусть будет по-твоему.»"},
+{en:"cut smth up",meaning:"to cut something into pieces",ru:"разрезать на куски",ex_en:"She cut up the vegetables before adding them to the pot.",ex_ru:"Она нарезала овощи перед тем, как добавить их в кастрюлю."},
+{en:"be almost there",meaning:"to be close to arriving somewhere, or close to finishing something",ru:"почти на месте; почти готово / почти сделано",ex_en:"Keep going — we're almost there!",ex_ru:"Продолжай — мы почти у цели!"},
+{en:"crew",meaning:"a group working together (ship/plane crew); informally: your group of friends",ru:"экипаж; команда; компания (разг.)",ex_en:"The whole crew showed up to help with the move.",ex_ru:"Вся компания пришла помочь с переездом."},
+{en:"budge",meaning:"to move slightly; or to change your opinion (usually in negative: won't budge)",ru:"сдвигаться с места; уступать (менять позицию)",ex_en:"The rock wouldn't budge no matter how hard we pushed.",ex_ru:"Камень не сдвигался с места, сколько мы ни толкали."},
+{en:"literally",meaning:"in the exact sense of the word; informally used as an intensifier (even when not literal)",ru:"буквально (точное значение) / прям, реально (усилитель в разговорной речи)",ex_en:"I literally ran into him on the street — we collided.",ex_ru:"Я буквально столкнулся с ним на улице — мы врезались друг в друга."},
+{en:"disgusting",meaning:"causing strong feelings of disgust or revulsion",ru:"отвратительный, омерзительный",ex_en:"The smell coming from the bin was absolutely disgusting.",ex_ru:"Запах из мусорного ведра был просто отвратительным."},
+{en:"sludge",meaning:"thick, muddy, or semi-liquid waste material",ru:"жижа, тина, густая грязная масса",ex_en:"The pipes were clogged with dark sludge.",ex_ru:"Трубы были забиты тёмной жижей."},
+{en:"catch on",meaning:"to begin to understand; or to become popular/widespread",ru:"понять, дойти (наконец понять) / войти в моду, прижиться",ex_en:"It took him a while, but he finally caught on.",ex_ru:"Ему понадобилось время, но в итоге до него дошло."},
+{en:"kinda like that one",meaning:"\"kinda\" = kind of (немного / вроде как); the whole phrase = something similar to that",ru:"что-то типа того / примерно как вот этот",ex_en:"\"What kind of vibe are you going for?\" — \"Kinda like that one.\"",ex_ru:"«Какую атмосферу ты хочешь создать?» — «Что-то типа вот этого.»"},
+{en:"jinx smth",meaning:"to bring bad luck to something by speaking too confidently about it",ru:"сглазить, накликать беду",ex_en:"Don't say we're going to win — you'll jinx it!",ex_ru:"Не говори, что мы победим — сглазишь!"},
+{en:"mean-looking",meaning:"appearing aggressive, intimidating, or scary in appearance",ru:"с угрожающей / злобной внешностью",ex_en:"A mean-looking guard stood at the entrance.",ex_ru:"У входа стоял охранник с угрожающим видом."},
+{en:"pop in",meaning:"to visit briefly and casually",ru:"заскочить, забежать ненадолго",ex_en:"I'll pop in after work to drop off the keys.",ex_ru:"Я заскочу после работы, чтобы отдать ключи"},
+{en:"sneak in",meaning:"to enter a place quietly without being noticed or permitted",ru:"прокрасться, войти незаметно",ex_en:"They sneaked in through the back door.",ex_ru:"Они прокрались через заднюю дверь."},
+{en:"pull off",meaning:"to successfully do something difficult or impressive",ru:"провернуть, суметь сделать что-то сложное; удачно осуществить",ex_en:"I can't believe she pulled it off — the event was perfect.",ex_ru:"Не верю, что она это провернула — мероприятие было идеальным."},
+{en:"assault",meaning:"a violent physical or verbal attack; legally: threatening or making unlawful contact",ru:"нападение, атака (физическая или словесная); нападать",ex_en:"He was charged with assault after the fight.",ex_ru:"Ему предъявили обвинение в нападении после драки."}];
+
+function hl(text, q) {
+  if (!q) return text;
+  var re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')', 'gi');
+  return text.replace(re, '<mark>$1</mark>');
+}
+
+function render(items, q) {
+  var cnt = document.getElementById('cnt');
+  var list = document.getElementById('list');
+  cnt.textContent = items.length + ' card' + (items.length !== 1 ? 's' : '');
+  if (items.length === 0) {
+    list.innerHTML = '<div class="empty"><span>☁</span>No results found</div>';
+    return;
+  }
+  list.innerHTML = items.map(function(d, i) {
+    var en = hl(d.en, q);
+    var ru = hl(d.ru, q);
+    var meaning = hl(d.meaning, q);
+    var exHtml = '';
+    if (d.ex_en) {
+      exHtml = '<div class="ex"><div class="ex-en">' + d.ex_en + '</div>' +
+        (d.ex_ru ? '<div class="ex-ru">' + d.ex_ru + '</div>' : '') + '</div>';
+    }
+    return '<div class="entry" style="animation-delay:' + Math.min(i * 0.015, 0.4) + 's">' +
+      '<div class="entry-top"><span class="headword">' + en + '</span>' +
+      (d.meaning ? '<span class="meaning">' + meaning + '</span>' : '') + '</div>' +
+      '<div class="ru">' + ru + '</div>' +
+      exHtml + '</div>';
+  }).join('');
+}
+
+function filter() {
+  var q = document.getElementById('q').value.toLowerCase().trim();
+  var filtered = q ? data.filter(function(d) {
+    return d.en.toLowerCase().indexOf(q) >= 0 ||
+           d.ru.toLowerCase().indexOf(q) >= 0 ||
+           d.meaning.toLowerCase().indexOf(q) >= 0;
+  }) : data;
+  render(filtered, q);
+}
+
+render(data, '');
+</script>
+</body>
+</html>
