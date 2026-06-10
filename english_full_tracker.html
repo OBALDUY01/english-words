@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Error Log</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0c0c10;--s1:#131318;--s2:#1a1a22;--s3:#22222e;--border:#2e2e3e;--border2:#3d3d52;--acc:#7c6af7;--text:#e8e8f2;--dim:#8888aa;--dim2:#5a5a78;--ok:#4ade80;--err:#f87171;--warn:#fb923c;--info:#60a5fa}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text)}
+.hdr{padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px;flex-shrink:0;background:var(--s1)}
+.hdr-title{font-size:20px;font-weight:600;letter-spacing:-0.5px}
+.hdr-title span{color:var(--acc)}
+.hdr-stats{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+.hdr-stat{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);background:var(--s2);padding:3px 10px;border-radius:20px;border:1px solid var(--border)}
+.hdr-stat strong{color:var(--acc)}
+.layout{display:flex;flex:1;overflow:hidden;height:calc(100vh - 49px)}
+.sidebar{width:190px;flex-shrink:0;border-right:1px solid var(--border);background:var(--s1);display:flex;flex-direction:column;overflow:hidden}
+.snav{padding:10px 8px;flex-shrink:0;border-bottom:1px solid var(--border)}
+.nb{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:7px;cursor:pointer;font-size:13px;color:var(--dim);transition:all .15s;margin-bottom:2px;border:none;background:transparent;width:100%;text-align:left}
+.nb:hover{color:var(--text);background:var(--s3)}
+.nb.on{color:var(--acc);background:rgba(124,106,247,0.1);font-weight:500}
+.sword{flex:1;overflow-y:auto;padding:8px}
+.sword::-webkit-scrollbar{width:3px}
+.sword::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.wlbl{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim2);letter-spacing:2px;text-transform:uppercase;padding:4px 8px 4px}
+.wchip{display:flex;align-items:center;justify-content:space-between;padding:5px 10px;border-radius:6px;cursor:pointer;font-size:12px;color:var(--dim);transition:all .15s;border:1px solid transparent}
+.wchip:hover{color:var(--text);background:var(--s3)}
+.wchip.on{color:var(--acc);background:rgba(124,106,247,0.1);border-color:rgba(124,106,247,0.3)}
+.wcnt{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim2);background:var(--s3);padding:1px 5px;border-radius:10px}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.toolbar{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-shrink:0;background:var(--s1);flex-wrap:wrap}
+.srch{flex:1;min-width:140px;background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:6px 12px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none;transition:border-color .15s}
+.srch:focus{border-color:var(--acc)}
+.srch::placeholder{color:var(--dim2)}
+.ftabs{display:flex;gap:4px;flex-wrap:wrap}
+.ft{font-family:'JetBrains Mono',monospace;font-size:10px;padding:4px 10px;border-radius:5px;border:1px solid var(--border);cursor:pointer;color:var(--dim);background:transparent;transition:all .15s;white-space:nowrap}
+.ft:hover{border-color:var(--border2);color:var(--text)}
+.ft.on{background:var(--acc);color:white;border-color:var(--acc)}
+.cntlbl{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim2);margin-left:auto;white-space:nowrap}
+.pwrap{display:flex;gap:0;flex:1;overflow:hidden}
+.pmain{flex:1;overflow-y:auto;padding:14px 16px}
+.pmain::-webkit-scrollbar{width:4px}
+.pmain::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.wpanel{width:300px;flex-shrink:0;border-left:1px solid var(--border);background:var(--s1);overflow-y:auto;display:none;flex-direction:column}
+.wpanel.open{display:flex}
+.wpanel::-webkit-scrollbar{width:3px}
+.wpanel::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.wphead{padding:14px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--s1);z-index:1}
+.wpclose{float:right;cursor:pointer;color:var(--dim);font-size:20px;line-height:1;transition:color .15s}
+.wpclose:hover{color:var(--text)}
+.wptitle{font-family:'JetBrains Mono',monospace;font-size:16px;color:var(--acc);margin-bottom:6px}
+.wplvl{font-size:11px;font-family:'JetBrains Mono',monospace;padding:2px 8px;border-radius:10px;display:inline-block;margin-bottom:8px}
+.wpdef{font-size:13px;color:var(--text);line-height:1.6;margin-bottom:4px}
+.wpsec{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim2);letter-spacing:2px;text-transform:uppercase;margin:12px 14px 6px}
+.wprule{background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:10px 12px;margin:0 14px 8px;font-size:12px;font-family:'JetBrains Mono',monospace;line-height:1.8;color:var(--dim)}
+.wprule .ok{color:var(--ok)}
+.wprule .no{color:var(--err)}
+.wpsc{background:var(--s2);border:1px solid var(--border);border-radius:7px;margin:0 14px 7px;cursor:pointer;transition:border-color .15s}
+.wpsc:hover{border-color:var(--border2)}
+.wpsci{padding:10px 12px}
+.wpscn{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim2);margin-bottom:4px}
+.wpscw{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--err);text-decoration:line-through;text-decoration-color:rgba(248,113,113,0.4);margin-bottom:3px;line-height:1.4}
+.wpscr{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--ok);line-height:1.4}
+.wprel{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 14px}
+.wprelc{font-size:11px;font-family:'JetBrains Mono',monospace;padding:3px 10px;border-radius:20px;border:1px solid var(--border);color:var(--dim);cursor:pointer;transition:all .15s}
+.wprelc:hover{border-color:var(--acc);color:var(--acc)}
+.page{display:none;height:100%}
+.page.on{display:block;overflow-y:auto;padding:14px 16px}
+#pg-sentences.on{display:flex;flex-direction:column;padding:0}
+.scard{background:var(--s1);border:1px solid var(--border);border-radius:9px;margin-bottom:9px;overflow:hidden;transition:border-color .15s}
+.scard:hover{border-color:var(--border2)}
+.scard.hl{border-color:var(--acc);box-shadow:0 0 0 1px rgba(124,106,247,0.2)}
+.schead{display:flex;gap:10px;padding:12px 14px;cursor:pointer;align-items:flex-start}
+.scnum{font-family:'JetBrains Mono',monospace;font-size:18px;color:var(--acc);opacity:.22;line-height:1;min-width:24px;flex-shrink:0}
+.scsents{flex:1;display:flex;flex-direction:column;gap:4px}
+.scw{font-size:12px;font-family:'JetBrains Mono',monospace;padding:4px 8px;background:rgba(248,113,113,0.06);color:#fca5a5;border-radius:4px;text-decoration:line-through;text-decoration-color:rgba(248,113,113,0.3);line-height:1.4}
+.scr{font-size:12px;font-family:'JetBrains Mono',monospace;padding:4px 8px;background:rgba(74,222,128,0.06);color:#86efac;border-radius:4px;line-height:1.4}
+.sctags{display:flex;gap:3px;margin-top:4px;flex-wrap:wrap}
+.sctag{font-size:9px;font-family:'JetBrains Mono',monospace;padding:2px 6px;border-radius:10px;letter-spacing:.5px;text-transform:uppercase}
+.sctog{font-size:11px;color:var(--dim2);padding:3px 7px;border:1px solid var(--border);border-radius:4px;flex-shrink:0;transition:all .15s;align-self:flex-start}
+.scard:hover .sctog{border-color:var(--border2);color:var(--dim)}
+.scbody{display:none;border-top:1px solid var(--border);padding:11px 14px}
+.scbody.open{display:block}
+.scerrs{display:flex;flex-direction:column;gap:6px}
+.scer{display:flex;gap:7px;font-size:12px;line-height:1.5;align-items:flex-start}
+.et{font-size:9px;font-family:'JetBrains Mono',monospace;padding:2px 6px;border-radius:3px;flex-shrink:0;letter-spacing:.5px;white-space:nowrap;margin-top:1px}
+.etg{background:rgba(96,165,250,0.1);color:#93c5fd;border:1px solid rgba(96,165,250,0.2)}
+.etv{background:rgba(248,180,106,0.1);color:#fcd34d;border:1px solid rgba(248,180,106,0.2)}
+.eti{background:rgba(167,139,250,0.1);color:#c4b5fd;border:1px solid rgba(167,139,250,0.2)}
+.ets{background:rgba(248,113,200,0.1);color:#f9a8d4;border:1px solid rgba(248,113,200,0.2)}
+.etp{background:rgba(106,247,200,0.1);color:#6ee7b7;border:1px solid rgba(106,247,200,0.2)}
+.eto{background:rgba(74,222,128,0.1);color:#86efac;border:1px solid rgba(74,222,128,0.2)}
+.etx{background:rgba(248,113,113,0.15);color:#fca5a5;border:1px solid rgba(248,113,113,0.3)}
+.em{color:#fca5a5;font-family:'JetBrains Mono',monospace;font-size:11px}
+.es{color:#86efac;font-family:'JetBrains Mono',monospace;font-size:11px}
+.scwds{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;padding-top:8px;border-top:1px solid var(--border)}
+.swlbl{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--dim2);align-self:center;flex-shrink:0}
+.wtag{font-size:11px;font-family:'JetBrains Mono',monospace;padding:3px 9px;border-radius:20px;border:1px solid rgba(124,106,247,0.3);color:var(--acc);cursor:pointer;transition:all .15s;background:rgba(124,106,247,0.05)}
+.wtag:hover{background:rgba(124,106,247,0.15)}
+.tg-g{background:rgba(96,165,250,0.08);color:#93c5fd;border:1px solid rgba(96,165,250,0.2)}
+.tg-v{background:rgba(248,180,106,0.08);color:#fcd34d;border:1px solid rgba(248,180,106,0.2)}
+.tg-i{background:rgba(167,139,250,0.08);color:#c4b5fd;border:1px solid rgba(167,139,250,0.2)}
+.tg-s{background:rgba(248,113,200,0.08);color:#f9a8d4;border:1px solid rgba(248,113,200,0.2)}
+.tg-p{background:rgba(106,247,200,0.08);color:#6ee7b7;border:1px solid rgba(106,247,200,0.2)}
+.tg-o{background:rgba(74,222,128,0.08);color:#86efac;border:1px solid rgba(74,222,128,0.2)}
+.tg-x{background:rgba(248,113,113,0.08);color:#fca5a5;border:1px solid rgba(248,113,113,0.2)}
+.pc{background:var(--s1);border:1px solid var(--border);border-radius:9px;padding:14px;display:flex;gap:12px;margin-bottom:9px;transition:border-color .15s}
+.pc:hover{border-color:var(--border2)}
+.picon{font-size:20px;min-width:26px;flex-shrink:0}
+.ptitle{font-size:14px;font-weight:500;margin-bottom:7px}
+.pexs{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.pb{font-size:11px;font-family:'JetBrains Mono',monospace;padding:3px 8px;border-radius:4px;background:rgba(248,113,113,0.08);color:#fca5a5;border:1px solid rgba(248,113,113,0.2)}
+.pg{font-size:11px;font-family:'JetBrains Mono',monospace;padding:3px 8px;border-radius:4px;background:rgba(74,222,128,0.08);color:#86efac;border:1px solid rgba(74,222,128,0.2)}
+.pnote{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--dim2);margin-top:7px}
+.pcnt{font-size:11px;font-family:'JetBrains Mono',monospace;padding:2px 7px;background:var(--s3);border-radius:10px;color:var(--dim);margin-left:8px}
+.wgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.wc{background:var(--s1);border:1px solid var(--border);border-radius:9px;padding:14px;cursor:pointer;transition:all .2s}
+.wc:hover{border-color:var(--acc);transform:translateY(-1px)}
+.wctit{font-size:16px;font-weight:500;color:var(--acc);margin-bottom:3px;font-family:'JetBrains Mono',monospace}
+.wcmeta{display:flex;gap:5px;margin-bottom:8px}
+.wccnt{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--dim2);background:var(--s3);padding:2px 7px;border-radius:10px}
+.wcdef{font-size:12px;color:var(--dim);line-height:1.5;margin-bottom:8px}
+.wcrule{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--dim2);border-top:1px solid var(--border);padding-top:8px;line-height:1.7}
+.wcrule .ok{color:#86efac}
+.wcrule .no{color:#fca5a5}
+.rc{background:var(--s1);border:1px solid var(--border);border-radius:9px;padding:14px 16px;display:flex;gap:12px;margin-bottom:9px;transition:border-color .15s}
+.rc:hover{border-color:var(--border2)}
+.rnum{font-family:'JetBrains Mono',monospace;font-size:20px;color:var(--acc);opacity:.25;line-height:1;min-width:28px}
+.rtit{font-size:14px;font-weight:500;margin-bottom:7px}
+.rexs{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.rnote{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--dim2);margin-top:6px}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:20px}
+.pcard{background:var(--s1);border:1px solid var(--border);border-radius:9px;padding:14px}
+.ptitlep{font-size:12px;color:var(--dim);margin-bottom:6px}
+.pnum{font-size:28px;font-weight:500}
+.psub{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--dim2);margin-top:2px}
+.sb{margin-bottom:14px}
+.sbrow{display:flex;justify-content:space-between;margin-bottom:5px;font-size:13px}
+.sbv{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--dim)}
+.sbtr{height:3px;background:var(--s3);border-radius:2px;overflow:hidden}
+.sbf{height:100%;border-radius:2px;transition:width 1.2s ease}
+.tl{position:relative;padding-left:22px}
+.tl::before{content:'';position:absolute;left:4px;top:0;bottom:0;width:1px;background:var(--border)}
+.tli{position:relative;margin-bottom:20px}
+.tld{position:absolute;left:-19px;top:5px;width:10px;height:10px;border-radius:50%;border:1.5px solid var(--border2);background:var(--bg);transition:all .2s}
+.tli:hover .tld{border-color:var(--acc);background:var(--acc)}
+.tll{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--acc);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px}
+.tlti{font-size:14px;font-weight:500;margin-bottom:3px}
+.tlde{font-size:12px;color:var(--dim);line-height:1.6;max-width:500px}
+.bdg{display:inline-block;font-size:11px;font-family:'JetBrains Mono',monospace;padding:2px 9px;border-radius:10px;margin-top:5px}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="hdr-title">Error<span>.</span>Log</div>
+  <div class="hdr-stats">
+    <div class="hdr-stat">Предложений: <strong id="tc">0</strong></div>
+    <div class="hdr-stat">Уровень: <strong>B2+</strong></div>
+    <div class="hdr-stat">Цель: <strong style="color:var(--ok)">C1</strong></div>
+  </div>
+</div>
+<div class="layout">
+<div class="sidebar">
+  <div class="snav">
+    <button class="nb on" onclick="navTo('sentences',this)">📋 Предложения</button>
+    <button class="nb" onclick="navTo('patterns',this)">⚠️ Паттерны</button>
+    <button class="nb" onclick="navTo('words',this)">📖 Словарь</button>
+    <button class="nb" onclick="navTo('rules',this)">✅ Правила</button>
+    <button class="nb" onclick="navTo('progress',this)">📈 Прогресс</button>
+  </div>
+  <div class="sword" id="sw"><div class="wlbl">Слова</div></div>
+</div>
+<div class="main">
+  <div id="pg-sentences" class="page on">
+    <div class="toolbar">
+      <input class="srch" type="text" placeholder="Поиск..." oninput="doSearch(this.value)" id="si">
+      <div class="ftabs">
+        <div class="ft on" onclick="doFilt(this,'all')">Все</div>
+        <div class="ft" onclick="doFilt(this,'g')">Грамм</div>
+        <div class="ft" onclick="doFilt(this,'v')">Лексика</div>
+        <div class="ft" onclick="doFilt(this,'i')">Идиомы</div>
+        <div class="ft" onclick="doFilt(this,'s')">Орфогр</div>
+        <div class="ft" onclick="doFilt(this,'p')">Предлоги</div>
+        <div class="ft" onclick="doFilt(this,'o')">✓ Верные</div>
+        <div class="ft" onclick="doFilt(this,'x')">⚠ Паттерн</div>
+      </div>
+      <div class="cntlbl" id="vc"></div>
+    </div>
+    <div class="pwrap">
+      <div class="pmain" id="cw"></div>
+      <div class="wpanel" id="wp">
+        <div class="wphead">
+          <span class="wpclose" onclick="closeP()">×</span>
+          <div class="wptitle" id="wpt"></div>
+          <div id="wpl"></div>
+          <div class="wpdef" id="wpd"></div>
+        </div>
+        <div id="wpb"></div>
+      </div>
+    </div>
+  </div>
+  <div id="pg-patterns" class="page"><div id="patg"></div></div>
+  <div id="pg-words" class="page"><div class="wgrid" id="wg"></div></div>
+  <div id="pg-rules" class="page"><div id="rl"></div></div>
+  <div id="pg-progress" class="page"><div id="pro"></div></div>
+</div>
+</div>
+<script>
+const S=[
+{n:1,p:1,w:"our operations was disrupted due to his fall",r:"Our operations were disrupted due to his fall",t:["g"],wds:["disrupt"],e:[{t:"g",l:"СОГЛАСОВАНИЕ",x:"<span class='em'>operations was</span>→<span class='es'>operations were</span>"}]},
+{n:2,p:1,w:"",r:"We need to reduce costs ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"reduce costs = устойчивая коллокация ✓"}]},
+{n:3,p:1,w:"she persuaded him to steak around",r:"She persuaded him to stick around",t:["i","v"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"<span class='em'>steak around</span> не существует→<span class='es'>stick around</span>"}]},
+{n:4,p:1,w:"She is driving force of the project",r:"She is the driving force of the project",t:["g"],wds:[],e:[{t:"g",l:"АРТИКЛЬ",x:"Пропущен <span class='es'>the</span> перед driving force"}]},
+{n:5,p:1,w:"Please abide the inner company rules",r:"Please abide by the internal company rules",t:["p","v"],wds:[],e:[{t:"p",l:"ПРЕДЛОГ",x:"<span class='em'>abide the rules</span>→<span class='es'>abide BY the rules</span>"},{t:"v",l:"ЛЕКСИКА",x:"<span class='em'>inner</span>→<span class='es'>internal</span>"}]},
+{n:6,p:1,w:"she looked as flabbergasted",r:"She looked flabbergasted",t:["g"],wds:["flabbergasted"],e:[{t:"g",l:"СТРУКТУРА",x:"<span class='em'>looked as flabbergasted</span>→<span class='es'>looked flabbergasted</span> — после linking verb без 'as'"}]},
+{n:7,p:1,w:"He was devasted after lossing everything he had worked over them all along",r:"He was devastated after losing everything he had worked for all along",t:["s","p"],wds:[],e:[{t:"s",l:"ОРФОГРАФИЯ",x:"<span class='em'>devasted</span>→<span class='es'>devastated</span>; <span class='em'>lossing</span>→<span class='es'>losing</span>"},{t:"p",l:"ПРЕДЛОГ",x:"<span class='em'>worked over them</span>→<span class='es'>worked for</span>"}]},
+{n:8,p:1,w:"she tend to backbite her friends",r:"She tends to backbite her friends",t:["g"],wds:[],e:[{t:"g",l:"СОГЛАСОВАНИЕ",x:"<span class='em'>she tend</span>→<span class='es'>she tends</span> — 3 л. ед.ч."}]},
+{n:9,p:1,w:"Actions speaks loudly than words is a proverb",r:"\"Actions speak louder than words\" is a proverb",t:["g","v"],wds:[],e:[{t:"g",l:"СОГЛАСОВАНИЕ",x:"<span class='em'>Actions speaks</span>→<span class='es'>Actions speak</span>"},{t:"v",l:"СТЕПЕНЬ",x:"<span class='em'>loudly than</span>→<span class='es'>louder than</span>"}]},
+{n:10,p:1,w:"she is the spitting image of her mother not only in appearance but also in personality",r:"She is the spitting image of her mother — not only in appearance but also in personality ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"spitting image = вылитый. not only...but also ✓"}]},
+{n:11,p:1,w:"",r:"He has been bedridden for weeks ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"bedridden = прикованный к постели. Present Perfect + for ✓"}]},
+{n:12,p:1,w:"Come in one at a time",r:"Come in one at a time ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"one at a time = по одному ✓"}]},
+{n:13,p:1,w:"",r:"He is presumably at home ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"presumably = по всей видимости. Позиция наречия верная ✓"}]},
+{n:14,p:1,w:"A young man budged his sits to elder grandma",r:"A young man gave up his seat to an elderly woman",t:["v"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"<span class='em'>budged his sits</span>→<span class='es'>gave up his seat</span>; <span class='em'>elder grandma</span>→<span class='es'>elderly woman</span>"}]},
+{n:15,p:1,w:"She messed up / screwed up a presentation",r:"She messed up / screwed up the presentation ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"mess up / screw up = провалить ✓"}]},
+{n:16,p:2,w:"",r:"I noticed a pattern in his behavior ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"pattern in his behavior = верная коллокация ✓"}]},
+{n:17,p:2,w:"He finally told her to quit hers nagging",r:"He finally told her to quit her nagging",t:["g"],wds:[],e:[{t:"g",l:"МЕСТОИМ",x:"<span class='em'>hers nagging</span>→<span class='es'>her nagging</span> — hers без существительного"}]},
+{n:18,p:2,w:"",r:"Let's face it — we need some help ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"Let's face it = давайте признаем ✓"}]},
+{n:19,p:2,w:"",r:"I am done with this project ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"done with = закончил/сыт по горло ✓"}]},
+{n:20,p:2,w:"Sorry I didn't catch that could you recap / repeat?",r:"Sorry, I didn't catch that — could you recap / repeat? ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"didn't catch that = не расслышал. recap = кратко повторить ✓"}]},
+{n:21,p:2,w:"At this time you must abide the rules so that you have infringed the rules before",r:"At this point, you must abide by the rules, as you have infringed them before",t:["p","v"],wds:[],e:[{t:"p",l:"ПРЕДЛОГ",x:"<span class='em'>abide the rules</span>→<span class='es'>abide BY the rules</span>"},{t:"v",l:"СОЮЗ",x:"<span class='em'>so that</span>=цель→<span class='es'>as/since</span>=причина"}]},
+{n:22,p:2,w:"",r:"Time flies when you are having fun ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"Классическая идиома ✓"}]},
+{n:23,p:2,w:"",r:"She looked flabbergasted ✓",t:["o"],wds:["flabbergasted"],e:[{t:"o",l:"ВЕРНО",x:"Теперь без 'as' — исправлено! ✓"}]},
+{n:24,p:2,w:"She felt relief after passing the exam",r:"She felt a sense of relief after passing the exam",t:["v"],wds:[],e:[{t:"v",l:"КОЛЛОКАЦИЯ",x:"<span class='em'>felt relief</span>→<span class='es'>felt a sense of relief</span> или <span class='es'>felt relieved</span>"}]},
+{n:25,p:2,w:"",r:"No hard feelings / no offense — it was just business ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"no hard feelings = без обид ✓"}]},
+{n:26,p:2,w:"",r:"Go ahead — I am all ears ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"all ears = весь внимание ✓"}]},
+{n:27,p:2,w:"I lost my train of thoughts during the performance",r:"I lost my train of thought during the performance",t:["i"],wds:[],e:[{t:"i",l:"ИДИОМА",x:"<span class='em'>train of thoughts</span>→<span class='es'>train of thought</span> — только ед.ч.!"}]},
+{n:28,p:2,w:"My mind went blenk when they asked me a query",r:"My mind went blank when they asked me a question",t:["s","v"],wds:[],e:[{t:"s",l:"ОРФОГРАФИЯ",x:"<span class='em'>blenk</span>→<span class='es'>blank</span>"},{t:"v",l:"ЛЕКСИКА",x:"<span class='em'>query</span>=техн.запрос→<span class='es'>question</span>"}]},
+{n:29,p:2,w:"",r:"Don't distract me while I am working ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"while + Continuous = верная конструкция ✓"}]},
+{n:30,p:2,w:"",r:"We decided to hike up the mountain early in the morning ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"hike up = подниматься пешком ✓"}]},
+{n:31,p:3,w:"He breathed profoundly and got a hold himself",r:"He breathed deeply and got a hold of himself",t:["v","p"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"<span class='em'>breathed profoundly</span>→<span class='es'>breathed deeply</span> — profoundly для абстрактного"},{t:"p",l:"ПРЕДЛОГ",x:"<span class='em'>got a hold himself</span>→<span class='es'>got a hold OF himself</span>"}]},
+{n:32,p:3,w:"",r:"There was serious fallout after the decision ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"fallout = последствия, отголоски ✓"}]},
+{n:33,p:3,w:"Rescue workers looked for /searched through the rubble for survivors refusing to lose hope despite the destruction's devastating scale",r:"Rescue workers searched through the rubble for survivors, refusing to abandon hope despite the devastating scale of the destruction",t:["v"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"<span class='em'>destruction's scale</span>→<span class='es'>scale of the destruction</span> — неодушевлённые без 's"}]},
+{n:34,p:3,w:"",r:"The building remained intact ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"remained intact = остался целым ✓"}]},
+{n:35,p:3,w:"The director made it absolutely clear that if the realise fail due to corners being cut the circumstances will be fully on the leader of project's head",r:"The director made it absolutely clear that if the release fails due to corners being cut, it will be entirely on the project leader's head",t:["s","v"],wds:[],e:[{t:"s",l:"ОРФОГРАФИЯ",x:"<span class='em'>realise</span>→<span class='es'>release</span>"},{t:"v",l:"ИДИОМА",x:"<span class='em'>circumstances will be on head</span>→<span class='es'>it will be on someone's head</span>"}]},
+{n:36,p:3,w:"",r:"She squeezed through the narrow gap ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"squeezed through = протиснулась сквозь ✓"}]},
+{n:37,p:3,w:"Some elder gasbag was feeding pigeons at the National Park in New York",r:"Some old gasbag was feeding pigeons in Central Park",t:["v"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"<span class='em'>elder</span>=семейное сравнение→<span class='es'>old/elderly</span>; <span class='em'>National Park</span>→<span class='es'>Central Park</span>"}]},
+{n:38,p:3,w:"He was a benevolent imperor who took care of his forks",r:"He was a benevolent emperor who took care of his people",t:["s","v"],wds:[],e:[{t:"s",l:"ОРФОГРАФИЯ",x:"<span class='em'>imperor</span>→<span class='es'>emperor</span>"},{t:"v",l:"ЛЕКСИКА",x:"<span class='em'>forks</span>=вилки→<span class='es'>people</span>"}]},
+{n:39,p:3,w:"I am not changing my mind said her and he said Have it you way",r:"\"I am not changing my mind,\" she said, and he replied, \"Have it your way.\"",t:["g","s"],wds:[],e:[{t:"g",l:"ПРЯМАЯ РЕЧЬ",x:"<span class='em'>said her</span>→<span class='es'>she said</span> — неверный порядок"},{t:"s",l:"ОРФОГРАФИЯ",x:"<span class='em'>you way</span>→<span class='es'>your way</span>"}]},
+{n:40,p:3,w:"",r:"He was desperately waiting for any news about his family ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"desperately waiting. any news усиливает отчаяние ✓"}]},
+{n:41,p:3,w:"He got across his thoughts clearly",r:"He got his thoughts across clearly",t:["g"],wds:[],e:[{t:"g",l:"ПОРЯДОК",x:"<span class='em'>got across his thoughts</span>→<span class='es'>got his thoughts across</span> — объект между частями"}]},
+{n:42,p:3,w:"",r:"The fever was so high that he started hallucinating ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"so...that конструкция. hallucinate ✓"}]},
+{n:43,p:3,w:"",r:"Nothing can quench his thirst in this heat ✓",t:["o"],wds:["quench"],e:[{t:"o",l:"ВЕРНО",x:"quench his thirst = отличная коллокация ✓"}]},
+{n:44,p:3,w:"The streets were hideously filthy after the festival",r:"The streets were hideously filthy after the festival ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"hideously filthy = нестандартная но живая коллокация ✓"}]},
+{n:45,p:3,w:"a little forethought we could have avoided the whole it",r:"With a little forethought, we could have avoided the whole mess",t:["p","v"],wds:["forethought"],e:[{t:"p",l:"ПРЕДЛОГ",x:"<span class='em'>a little forethought</span>→<span class='es'>WITH a little forethought</span>"},{t:"v",l:"ЛЕКСИКА",x:"<span class='em'>the whole it</span> НЕ СУЩЕСТВУЕТ→<span class='es'>the whole mess / all of it</span>"}]},
+{n:46,p:4,w:"",r:"don't take his words at face value ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"at face value = за чистую монету ✓"}]},
+{n:47,p:4,w:"",r:"they locked away the valuables for safety ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"lock away = надёжно хранить ✓"}]},
+{n:48,p:4,w:"despite the critics he was standing his ground and protecting his decision",r:"Despite the criticism, he stood his ground and defended his decision",t:["v"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"<span class='em'>the critics</span>(люди)→<span class='es'>the criticism</span>(действие); <span class='em'>protecting</span>→<span class='es'>defending</span>"}]},
+{n:49,p:4,w:"we fished fish in the creek behind the farm",r:"We fished in the creek behind the farm",t:["v"],wds:[],e:[{t:"v",l:"ТАВТОЛОГИЯ",x:"<span class='em'>fished fish</span>→просто <span class='es'>fished</span>"}]},
+{n:50,p:4,w:"",r:"he said that he was up the creek ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"up the creek = в беде. Правильная косвенная речь ✓"}]},
+{n:51,p:4,w:"",r:"he had the last chance to redeem himself in the final match ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"redeem himself = искупить вину ✓"}]},
+{n:52,p:4,w:"",r:"I was flabbergasted when she quit without warning ✓",t:["o"],wds:["flabbergasted"],e:[{t:"o",l:"ВЕРНО",x:"flabbergasted верно после was ✓"}]},
+{n:53,p:4,w:"the invasion expicilated / annihilated /wiped out / disrupted / destroyed the lives of millions of citizens / civilians/ forks/people",r:"The invasion annihilated / devastated the lives of millions of civilians",t:["v","s"],wds:["disrupt"],e:[{t:"v",l:"ЛЕКСИКА",x:"<span class='em'>expicilated</span> не существует; <span class='em'>forks</span>=вилки→<span class='es'>civilians/people</span>"},{t:"s",l:"ОРФОГРАФИЯ",x:"→<span class='es'>civilians</span>"}]},
+{n:54,p:4,w:"",r:"she enrolled in an online coding course ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"enrol IN = верный предлог ✓"}]},
+{n:55,p:4,w:"",r:"don't tell her anything she is a total blabbermouth ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"blabbermouth = болтун ✓"}]},
+{n:56,p:4,w:"stand clear at the doors the train is about to move",r:"Stand clear of the doors — the train is about to move",t:["p"],wds:[],e:[{t:"p",l:"ПРЕДЛОГ",x:"<span class='em'>clear at the doors</span>→<span class='es'>clear OF the doors</span>"}]},
+{n:57,p:4,w:"we need durable materials that are capable of withstand harsh weather",r:"We need durable materials capable of withstanding harsh weather",t:["g"],wds:[],e:[{t:"g",l:"ГЕРУНДИЙ",x:"<span class='em'>capable of withstand</span>→<span class='es'>capable of withstanding</span>"}]},
+{n:58,p:4,w:"after split up / break up she didn't miss him she just missed the love",r:"After the breakup, she didn't miss him — she just missed the love",t:["v"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"<span class='em'>after split up</span>→<span class='es'>after the breakup</span>"}]},
+{n:59,p:4,w:"he turned jis back on his oldest friend when things got hard",r:"He turned his back on his oldest friend when things got hard",t:["s"],wds:[],e:[{t:"s",l:"ОРФОГРАФИЯ",x:"<span class='em'>jis</span>→<span class='es'>his</span>"}]},
+{n:60,p:4,w:"she sat quietly downcast after hearing the news about the situation what happened in her bf country",r:"She sat quietly, downcast, after hearing news about what had happened in her boyfriend's country",t:["g","x"],wds:["downcast"],e:[{t:"x",l:"⚠ ПАТТЕРН ×6",x:"<span class='em'>situation what happened</span>→<span class='es'>what had happened</span> — НИКОГДА what!"},{t:"g",l:"ПАДЕЖ",x:"<span class='em'>her bf country</span>→<span class='es'>her boyfriend's country</span>"}]},
+{n:61,p:5,w:"",r:"she inherited her grandmother's house and her love of cooking ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"love OF cooking = верный предлог ✓"}]},
+{n:62,p:5,w:"he miraculously survived the accident without a scratch / wound / sore / crash",r:"He miraculously survived the accident without a scratch",t:["v"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"<span class='em'>sore</span>=прилаг; <span class='em'>crash</span>=авария→<span class='es'>without a scratch</span> = идиома"}]},
+{n:63,p:5,w:"",r:"she stood by her friend during the whole ordeal ✓",t:["o"],wds:["ordeal"],e:[{t:"o",l:"ВЕРНО",x:"stood by = поддерживала. ordeal = испытание ✓"}]},
+{n:64,p:5,w:"",r:"the new coach reinvigorated the whole team ✓",t:["o"],wds:["reinvigorate"],e:[{t:"o",l:"ВЕРНО",x:"reinvigorate = вдохнуть новую жизнь. C1 ✓"}]},
+{n:65,p:5,w:"they snuggled to each other under the blanket",r:"They snuggled up together under the blanket",t:["p"],wds:[],e:[{t:"p",l:"ПРЕДЛОГ",x:"<span class='em'>snuggled to each other</span>→<span class='es'>snuggled up together</span>"}]},
+{n:66,p:5,w:"",r:"they went after / chased / hunted the fugitives across three states ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"pursue/chase/hunt = все верны ✓"}]},
+{n:67,p:5,w:"nothing could quench his thrist in that heat",r:"Nothing could quench his thirst in that heat",t:["s"],wds:["quench"],e:[{t:"s",l:"ОРФОГРАФИЯ",x:"<span class='em'>thrist</span>→<span class='es'>thirst</span>"}]},
+{n:68,p:5,w:"during the trip she completely immersed herself into the local culture",r:"During the trip she completely immersed herself in the local culture",t:["p"],wds:[],e:[{t:"p",l:"ПРЕДЛОГ",x:"<span class='em'>immersed into</span>→<span class='es'>immersed IN</span>"}]},
+{n:69,p:5,w:"she was definetile flirting with me don't flatter yourself",r:"\"She was definitely flirting with me.\" — \"Don't flatter yourself.\"",t:["s"],wds:[],e:[{t:"s",l:"ОРФОГРАФИЯ",x:"<span class='em'>definetile</span>→<span class='es'>definitely</span>"}]},
+{n:70,p:5,w:"",r:"this project seems viable to me doesn't it ✓",t:["o"],wds:["contingent"],e:[{t:"o",l:"ВЕРНО",x:"viable = жизнеспособный. doesn't it = верный question tag ✓"}]},
+{n:71,p:5,w:"the company decided an agile approach to software development allowing the teams to respond quickly as much as possible",r:"The company adopted an agile approach to software development, allowing teams to respond as quickly as possible",t:["v"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"<span class='em'>decided an approach</span>→<span class='es'>adopted an approach</span>; <span class='em'>respond quickly as much as possible</span>→<span class='es'>as quickly as possible</span>"}]},
+{n:72,p:5,w:"the fake news is quickly profilerating around the world",r:"Fake news is proliferating rapidly around the world",t:["g","s"],wds:["proliferate"],e:[{t:"g",l:"СОГЛАСОВАНИЕ",x:"<span class='em'>fake news is</span> — верно (ед.ч.)"},{t:"s",l:"ОРФОГРАФИЯ",x:"<span class='em'>profilerating</span>→<span class='es'>proliferating</span>"}]},
+{n:73,p:5,w:"Hermione Granger completely expunged her parents memorizes about her",r:"Hermione Granger completely expunged her parents' memories of her",t:["s","g"],wds:[],e:[{t:"s",l:"ОРФОГРАФИЯ",x:"<span class='em'>memorizes</span>(глагол)→<span class='es'>memories</span>"},{t:"g",l:"ПАДЕЖ",x:"<span class='em'>her parents memorizes</span>→<span class='es'>her parents' memories</span>"}]},
+{n:74,p:5,w:"after spending many sleepless night on this way to reach my goals I have finally reached one so I cant contain my joy",r:"After spending many sleepless nights working towards my goals, I have finally reached one — I can't contain my joy",t:["g","v","s"],wds:[],e:[{t:"g",l:"МН. ЧИСЛО",x:"<span class='em'>sleepless night</span>→<span class='es'>sleepless nights</span>"},{t:"v",l:"ЛЕКСИКА",x:"<span class='em'>on this way</span>=дословный перевод→<span class='es'>working towards</span>"},{t:"s",l:"ОРФОГРАФИЯ",x:"<span class='em'>cant</span>→<span class='es'>can't</span>"}]},
+{n:75,p:5,w:"He doesn't managed to quench his knowleadge's thrist even after such much time",r:"He can't seem to quench his thirst for knowledge, even after all this time",t:["g","v","s"],wds:["quench"],e:[{t:"g",l:"ГРАММАТИКА",x:"<span class='em'>doesn't managed</span>→<span class='es'>can't seem to manage</span>"},{t:"v",l:"КОЛЛОКАЦИЯ",x:"<span class='em'>knowledge's thirst</span>→<span class='es'>thirst FOR knowledge</span>"},{t:"s",l:"ОРФОГРАФИЯ",x:"<span class='em'>knowleadge/thrist</span>→<span class='es'>knowledge/thirst</span>"}]},
+{n:76,p:6,w:"",r:"The team leader's enthusiasm was so contagious that even the most sceptical members became excited about the new project ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"contagious enthusiasm. so...that конструкция ✓"}]},
+{n:77,p:6,w:"",r:"I didn't help her in any way ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"in any way = ни в какой мере. Нет двойного отрицания ✓"}]},
+{n:78,p:6,w:"",r:"It will happen in summer presumably → Presumably, it will happen in summer",t:["g"],wds:[],e:[{t:"g",l:"ПОЗИЦИЯ НАРЕЧИЯ",x:"presumably лучше в начале или перед глаголом"}]},
+{n:79,p:6,w:"",r:"Could you stop nagging me and just bear with me for a moment? ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"bear with me = потерпи. stop nagging ✓"}]},
+{n:80,p:6,w:"",r:"Don't be such a self-absorbed weasel ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"self-absorbed = эгоцентричный. weasel = хитрый ненадёжный ✓"}]},
+{n:81,p:6,w:"he explicitly said that he wasn't going to share any information to others",r:"He explicitly said that he wasn't going to share any information with others",t:["p"],wds:[],e:[{t:"p",l:"ПРЕДЛОГ",x:"<span class='em'>share to others</span>→<span class='es'>share WITH others</span>"}]},
+{n:82,p:6,w:"",r:"She gave him a gentle nudge to start the conversation ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"gentle nudge = мягкий толчок/намёк ✓"}]},
+{n:83,p:6,w:"",r:"We met on the ferry crossing the bay ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"on the ferry = верный предлог ✓"}]},
+{n:84,p:6,w:"the cat unnoticibly sneaked up on me",r:"The cat sneaked up on me unnoticed",t:["v"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"<span class='em'>unnoticibly</span>→<span class='es'>unnoticed</span> — прилагательное точнее"}]},
+{n:85,p:6,w:"",r:"Don't be a tattletale — just work it out yourselves ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"tattletale = ябеда. work it out = разобраться ✓"}]},
+{n:86,p:6,w:"it has never occurred to her that her colleague can deliberately sabotage a project while evidence didnt emerge",r:"It had never occurred to her that her colleague could deliberately sabotage the project — until the evidence emerged",t:["g","x"],wds:[],e:[{t:"g",l:"PAST PERFECT",x:"<span class='em'>has never occurred</span>→<span class='es'>had never occurred</span>"},{t:"x",l:"⚠ ПАТТЕРН",x:"<span class='em'>while evidence didn't emerge</span>→<span class='es'>until the evidence emerged</span>"}]},
+{n:87,p:7,w:"",r:"don't take his words at face value ✓ (повтор)",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"✓"}]},
+{n:88,p:7,w:"",r:"they locked away the valuables for safety ✓ (повтор)",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"✓"}]},
+{n:89,p:7,w:"despite the critics he was standing his ground and protecting his decision",r:"Despite the criticism, he stood his ground and defended his decision",t:["v"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"critics→criticism; protecting→defending"}]},
+{n:90,p:7,w:"we fished fish in the creek behind the farm",r:"We fished in the creek behind the farm",t:["v"],wds:[],e:[{t:"v",l:"ТАВТОЛОГИЯ",x:"fished fish → просто fished"}]},
+{n:91,p:7,w:"",r:"he said that he was up the creek ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"✓"}]},
+{n:92,p:7,w:"",r:"he had the last chance to redeem himself in the final match ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"✓"}]},
+{n:93,p:7,w:"",r:"I was flabbergasted when she quit without warning ✓",t:["o"],wds:["flabbergasted"],e:[{t:"o",l:"ВЕРНО",x:"✓"}]},
+{n:94,p:7,w:"",r:"she enrolled in an online coding course ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"✓"}]},
+{n:95,p:7,w:"stand clear at the doors the train is about to move",r:"Stand clear of the doors — the train is about to move",t:["p"],wds:[],e:[{t:"p",l:"ПРЕДЛОГ",x:"clear OF the doors"}]},
+{n:96,p:7,w:"we need durable materials that are capable of withstand harsh weather",r:"We need durable materials capable of withstanding harsh weather",t:["g"],wds:[],e:[{t:"g",l:"ГЕРУНДИЙ",x:"capable of withstanding"}]},
+{n:97,p:7,w:"after split up she didn't miss him she just missed the love",r:"After the breakup, she didn't miss him — she just missed the love",t:["v"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"after the breakup"}]},
+{n:98,p:7,w:"he turned jis back on his oldest friend when things got hard",r:"He turned his back on his oldest friend when things got hard",t:["s"],wds:[],e:[{t:"s",l:"ОРФОГРАФИЯ",x:"jis→his"}]},
+{n:99,p:7,w:"she sat quietly downcast after hearing the news about the situation what happened in her bf country",r:"She sat quietly, downcast, after hearing about what had happened in her boyfriend's country",t:["g","x"],wds:["downcast"],e:[{t:"x",l:"⚠ ПАТТЕРН",x:"situation what→what had happened"},{t:"g",l:"ПАДЕЖ",x:"bf→boyfriend's"}]},
+{n:100,p:7,w:"",r:"she inherited her grandmother's house and her love of cooking ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"love OF cooking ✓"}]},
+{n:101,p:8,w:"he miraculously survived the accident without a scratch / wound / sore / crash",r:"He miraculously survived the accident without a scratch",t:["v"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"without a scratch = идиома ✓; sore=прилаг; crash=авария"}]},
+{n:102,p:8,w:"",r:"she stood by her friend during the whole ordeal ✓",t:["o"],wds:["ordeal"],e:[{t:"o",l:"ВЕРНО",x:"✓"}]},
+{n:103,p:8,w:"",r:"the new coach reinvigorated the whole team ✓",t:["o"],wds:["reinvigorate"],e:[{t:"o",l:"ВЕРНО",x:"✓"}]},
+{n:104,p:8,w:"they snuggled to each other under the blanket to do something passisonsate",r:"They snuggled up together under the blanket",t:["p","s"],wds:[],e:[{t:"p",l:"ПРЕДЛОГ",x:"snuggled to→snuggled up together"},{t:"s",l:"ОРФОГРАФИЯ",x:"passisonsate→passionate"}]},
+{n:105,p:8,w:"nothing could quench his thrist in that heat",r:"Nothing could quench his thirst in that heat",t:["s"],wds:["quench"],e:[{t:"s",l:"ОРФОГРАФИЯ",x:"thrist→thirst"}]},
+{n:106,p:8,w:"during the trip she completely / absolutely / fully immersed herself into the local culture",r:"During the trip she completely immersed herself in the local culture",t:["p"],wds:[],e:[{t:"p",l:"ПРЕДЛОГ",x:"immersed into→immersed IN"}]},
+{n:107,p:8,w:"she was definetile flirting with me don't flatter yourself",r:"She was definitely flirting with me. — Don't flatter yourself.",t:["s"],wds:[],e:[{t:"s",l:"ОРФОГРАФИЯ",x:"definetile→definitely"}]},
+{n:108,p:8,w:"the company decided an agile approach to software development allowing the teams to respond quickly as much as possible",r:"The company adopted an agile approach to software development, allowing teams to respond as quickly as possible",t:["v"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"decided→adopted; as quickly as possible"}]},
+{n:109,p:8,w:"the fake news is quickly profilerating around the world with the help of social media",r:"Fake news is proliferating rapidly around the world, fuelled by social media",t:["s"],wds:["proliferate"],e:[{t:"s",l:"ОРФОГРАФИЯ",x:"profilerating→proliferating"}]},
+{n:110,p:8,w:"Hermione Granger completely expunged her parents memorizes about her because she was going to fight with the rivals /enemies",r:"Hermione Granger completely expunged her parents' memories of her because she was going to fight their enemies",t:["s","g","v"],wds:[],e:[{t:"s",l:"ОРФОГРАФИЯ",x:"memorizes→memories"},{t:"g",l:"ПАДЕЖ",x:"her parents'"},{t:"v",l:"ЛЕКСИКА",x:"rivals=соперники→enemies=враги"}]},
+{n:111,p:8,w:"after spending many sleepless night on this way to reach my goals I have finally reached one so I cant contain my joy",r:"After spending many sleepless nights working towards my goals, I have finally reached one — I can't contain my joy",t:["g","v","s"],wds:[],e:[{t:"g",l:"МН. ЧИСЛО",x:"sleepless night→nights"},{t:"v",l:"ЛЕКСИКА",x:"on this way→working towards"},{t:"s",l:"ОРФОГРАФИЯ",x:"cant→can't"}]},
+{n:112,p:8,w:"He doesn't managed to quench his knowleadge's thrist even after such much time",r:"He can't seem to quench his thirst for knowledge, even after all this time",t:["g","v","s"],wds:["quench"],e:[{t:"g",l:"ГРАММАТИКА",x:"doesn't managed→can't"},{t:"v",l:"КОЛЛОКАЦИЯ",x:"knowledge's thirst→thirst for knowledge"},{t:"s",l:"ОРФОГРАФИЯ",x:"knowleadge/thrist"}]},
+{n:113,p:8,w:"this negiotation is high stakes one wrong movement can result in falling apart deals",r:"This is a high-stakes negotiation — one wrong move could cause the deal to fall apart",t:["s","v"],wds:[],e:[{t:"s",l:"ОРФОГРАФИЯ",x:"negiotation→negotiation"},{t:"v",l:"ЛЕКСИКА",x:"movement→move; high-stakes через дефис"}]},
+{n:114,p:9,w:"",r:"He had tripped over his words → He stumbled over his words and floundered during the performance",t:["v"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"stumble over words = более устойчивая идиома; during не before"}]},
+{n:115,p:9,w:"",r:"He refrained from commenting ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"refrain from + gerund = воздержаться от ✓"}]},
+{n:116,p:9,w:"The plan fell apart at the last moment Oh, what a pity situation it was",r:"The plan fell apart at the last moment — what a pity!",t:["v"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"<span class='em'>what a pity situation</span>→<span class='es'>What a pity!</span> — pity не прилагательное"}]},
+{n:117,p:9,w:"I need some shut eye before passing the exams",r:"I need some shut-eye before the exams",t:["v","s"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"before passing→before the exams (ещё не сдал)"},{t:"s",l:"ОРФОГРАФИЯ",x:"shut-eye через дефис"}]},
+{n:118,p:9,w:"",r:"Don't be such a wuss ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"wuss = слабак ✓"}]},
+{n:119,p:9,w:"Harry Potter said to Severus Snape that He is a muss, a coward",r:"Harry Potter called Severus Snape a coward",t:["g","v"],wds:[],e:[{t:"g",l:"ПРЯМАЯ РЕЧЬ",x:"Смешение прямой и косвенной речи"},{t:"v",l:"ЛЕКСИКА",x:"muss не существует как оскорбление"}]},
+{n:120,p:9,w:"",r:"He wore shabby clothes ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"shabby = потрёпанный ✓"}]},
+{n:121,p:9,w:"Yeao buddy you need to loosen up it just a competition",r:"Yeah, buddy — you need to loosen up, it's just a competition!",t:["s","g"],wds:[],e:[{t:"s",l:"ОРФОГРАФИЯ",x:"Yeao→Yeah"},{t:"g",l:"ПРОПУСК",x:"it just→it's just"}]},
+{n:122,p:9,w:"He budged his sit to the elder women it is such a respectful behavior nowadays in that hursh hidious world",r:"He gave up his seat to an elderly woman — such a respectful gesture in today's harsh world",t:["v","s"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"budged his sit→gave up his seat; elder women→elderly woman"},{t:"s",l:"ОРФОГРАФИЯ",x:"hursh→harsh"}]},
+{n:123,p:9,w:"he was excluded from the group upon his request",r:"He withdrew from the group at his own request",t:["v"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"excluded=принудительно→withdrew=сам попросил"}]},
+{n:124,p:9,w:"he barged in the cabinet without knocking",r:"He barged into the office without knocking",t:["p","v"],wds:[],e:[{t:"p",l:"ПРЕДЛОГ",x:"barged in→barged INTO"},{t:"v",l:"ЛЕКСИКА",x:"cabinet=шкаф→office=кабинет"}]},
+{n:125,p:9,w:"",r:"she was determined despite the failures ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"determined despite = несмотря на неудачи ✓"}]},
+{n:126,p:9,w:"Napoleon Bonapart was banished from his Kingdom to an unhabitable island",r:"Napoleon Bonaparte was exiled from France to a remote, uninhabitable island",t:["s","v"],wds:[],e:[{t:"s",l:"ОРФОГРАФИЯ",x:"Bonapart→Bonaparte; unhabitable→uninhabitable"},{t:"v",l:"ЛЕКСИКА",x:"Kingdom→France; banished→exiled"}]},
+{n:127,p:9,w:"He vanished into the air / The horizon of the land slowly vanished from sight",r:"He vanished into thin air / The coastline slowly vanished from sight",t:["i","v"],wds:[],e:[{t:"i",l:"ИДИОМА",x:"into the air→into THIN air — фиксированная"},{t:"v",l:"ЛЕКСИКА",x:"horizon of the land→coastline/shore"}]},
+{n:128,p:9,w:"",r:"she is on a mission ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"✓"}]},
+{n:129,p:9,w:"",r:"He still holds a grudge ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"hold a grudge = таить обиду ✓"}]},
+{n:130,p:9,w:"",r:"he got into programming after school ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"get into = увлечься ✓"}]},
+{n:131,p:10,w:"",r:"she is the spitting image of her mother not only in appearance but also in personality ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"✓"}]},
+{n:132,p:10,w:"he had a chance to redeem himself in the last match",r:"He had a chance to redeem himself in the final match ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"redeem himself. final точнее last ✓"}]},
+{n:133,p:10,w:"she read the entire book just a few / a couple days",r:"She read the entire book in just a few days / in a couple of days",t:["p","g"],wds:[],e:[{t:"p",l:"ПРЕДЛОГ",x:"IN a few days"},{t:"g",l:"ГРАММАТИКА",x:"a couple OF days"}]},
+{n:134,p:10,w:"bringing flowers to your solace is a great gesture mark my words",r:"Bringing flowers to your partner is a great gesture — mark my words",t:["v"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"solace=утешение→partner/soulmate"}]},
+{n:135,p:10,w:"",r:"the train came to a halt ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"come to a halt ✓"}]},
+{n:136,p:10,w:"in deference to the elders he stayed silent / kept quiet / kept staying silent",r:"In deference to the elders, he stayed silent / kept quiet",t:["v"],wds:[],e:[{t:"v",l:"ТАВТОЛОГИЯ",x:"kept staying silent→stayed silent"}]},
+{n:137,p:10,w:"she is as diligent as her sister who works as a CEO in a bigtech company",r:"She is as diligent as her sister, who works as a CEO at a big tech company",t:["p"],wds:[],e:[{t:"p",l:"ПРЕДЛОГ",x:"in a bigtech→at a big tech"}]},
+{n:138,p:10,w:"he ratted his friend to the teacher accused of they on writing off",r:"He ratted on his friend to the teacher, accusing them of cheating",t:["p","v"],wds:[],e:[{t:"p",l:"ПРЕДЛОГ",x:"ratted his friend→ratted ON his friend"},{t:"v",l:"ЛЕКСИКА",x:"writing off→cheating"}]},
+{n:139,p:10,w:"",r:"sorry I have been distracted I have got a lot on my mind lately ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"a lot on my mind ✓"}]},
+{n:140,p:10,w:"could you sir please keep your eye on my bag while I am registring for the flights",r:"Could you please keep an eye on my bag while I check in?",t:["i","s"],wds:[],e:[{t:"i",l:"ИДИОМА",x:"keep your eye→keep AN eye"},{t:"s",l:"ОРФОГРАФИЯ",x:"registring→registering; check in"}]},
+{n:141,p:10,w:"they fought for generations struggled against political oppression",r:"For generations, they fought against / struggled against political oppression",t:["g"],wds:[],e:[{t:"g",l:"СТРУКТУРА",x:"Two verbs без союза→For generations, they fought against"}]},
+{n:142,p:10,w:"she got a cogent arguments in benefit for changing politic rules",r:"She put forward cogent arguments in favour of changing the political rules",t:["v"],wds:["cogent"],e:[{t:"v",l:"ЛЕКСИКА",x:"got→put forward; in benefit for→in favour of; politic→political"}]},
+{n:143,p:10,w:"\"I am already sick of your futile / inane promises\" - said she, closing the doors",r:"\"I am already sick of your futile / inane promises,\" she said, closing the door",t:["g"],wds:[],e:[{t:"g",l:"ПУНКТУАЦИЯ",x:"said she→she said (или инверсия); the doors→the door"}]},
+{n:144,p:10,w:"",r:"the idea came as an epiphany ✓",t:["o"],wds:["epiphany"],e:[{t:"o",l:"ВЕРНО",x:"epiphany = озарение. C1 ✓"}]},
+{n:145,p:10,w:"",r:"you are doing well keep it up ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"keep it up = продолжай в том же духе ✓"}]},
+{n:146,p:11,w:"we don't have plan but let us play it by ear",r:"We don't have a plan, but let's play it by ear",t:["g"],wds:[],e:[{t:"g",l:"АРТИКЛЬ",x:"a plan — пропущен артикль"}]},
+{n:147,p:11,w:"",r:"the storm struck with unexpected ferocity ✓",t:["o"],wds:["ferocity"],e:[{t:"o",l:"ВЕРНО",x:"ferocity = свирепость. C1 ✓"}]},
+{n:148,p:11,w:"that was pretty slick how did you do that so quickly",r:"That was pretty slick — how did you do that so quickly? ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"slick = ловко. Пунктуация ✓"}]},
+{n:149,p:11,w:"payments are straggered by months",r:"Payments are staggered over several months",t:["s","p"],wds:[],e:[{t:"s",l:"ОРФОГРАФИЯ",x:"straggered→staggered"},{t:"p",l:"ПРЕДЛОГ",x:"by months→over several months"}]},
+{n:150,p:11,w:"he was staggered by the news",r:"He was staggered by the news ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"staggered = ошеломлённый (полисемия) ✓"}]},
+{n:151,p:11,w:"these shoes goes together with your dress",r:"These shoes go with your dress",t:["g","v"],wds:[],e:[{t:"g",l:"СОГЛАСОВАНИЕ",x:"these shoes goes→go"},{t:"v",l:"КОЛЛОКАЦИЯ",x:"go together with→go with"}]},
+{n:152,p:11,w:"my phone is acting up / dont act up at school",r:"My phone is acting up / Don't act up at school ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"acting up = барахлит/плохо себя вести ✓"}]},
+{n:153,p:11,w:"he felt insignificance / negliagible in the crowd",r:"He felt insignificant in the crowd",t:["g","s"],wds:[],e:[{t:"g",l:"ЧАСТЬ РЕЧИ",x:"insignificance(сущ.)→insignificant(прил.)"},{t:"s",l:"ОРФОГРАФИЯ",x:"negliagible→negligible"}]},
+{n:154,p:11,w:"",r:"she finally confronted him about the lies ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"confront about ✓"}]},
+{n:155,p:11,w:"We need to confront our fears face to face to overcome them",r:"We need to confront our fears head-on to overcome them",t:["v"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"face to face=встреча людей→head-on=в лоб(для страхов)"}]},
+{n:156,p:11,w:"she have been sobbing quietly into the pillow all night",r:"She has been sobbing quietly into the pillow all night",t:["g"],wds:[],e:[{t:"g",l:"СОГЛАСОВАНИЕ",x:"she have→she has"}]},
+{n:157,p:11,w:"The sage narrated a sob story what concludes itself much more wise sermons that can change you mind over 360 degrees",r:"The sage told a moving story containing profound sermons capable of changing one's perspective",t:["g","v","x"],wds:[],e:[{t:"x",l:"⚠ ПАТТЕРН",x:"story what→story that"},{t:"v",l:"ЛЕКСИКА",x:"360 degrees→180 degrees = полный разворот"}]},
+{n:158,p:11,w:"this poll is too shallow to dive/divide into",r:"This pool is too shallow to dive into",t:["v"],wds:[],e:[{t:"v",l:"ПАРОНИМЫ",x:"poll=опрос→pool=бассейн; divide→dive"}]},
+{n:159,p:11,w:"after an incessent work and hard day she indulged herself a long shower session",r:"After an incessant, exhausting day, she indulged in a long shower",t:["s","p"],wds:["incessant"],e:[{t:"s",l:"ОРФОГРАФИЯ",x:"incessent→incessant"},{t:"p",l:"ПРЕДЛОГ",x:"indulged herself→indulged IN"}]},
+{n:160,p:11,w:"go away I need to stay some time alone",r:"Go away — I need some time alone",t:["v"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"stay some time alone→need some time alone"}]},
+{n:161,p:12,w:"It is too much snazzy topic for the performance do you think that is normal?",r:"It's too snazzy a topic for the performance — don't you think?",t:["g"],wds:[],e:[{t:"g",l:"СТРУКТУРА",x:"too much snazzy→too snazzy (too + adjective без much)"}]},
+{n:162,p:12,w:"she kept sitting quietly downcast after hearing the some facts about her sister",r:"She sat quietly, downcast, after hearing some troubling facts about her sister",t:["g"],wds:["downcast"],e:[{t:"g",l:"АРТИКЛЬ",x:"the some facts→some facts — the и some не сочетаются"}]},
+{n:163,p:12,w:"most people tend to associate success with purely financial wealth occassionally overlooknig the equally important crusial aspect",r:"Most people tend to associate success purely with financial wealth, occasionally overlooking the equally important aspects",t:["s"],wds:[],e:[{t:"s",l:"ОРФОГРАФИЯ",x:"occassionally/overlooknig/crusial"}]},
+{n:164,p:12,w:"many educators argue that forming / fostering a genuine / sincere love to / of learning in eraly childhood is key to longterm achievements / awards",r:"Many educators argue that fostering a genuine love of learning in early childhood is key to long-term academic achievement",t:["v","s"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"forming→fostering; love to→love OF; awards→achievement"},{t:"s",l:"ОРФОГРАФИЯ",x:"eraly→early; longterm→long-term"}]},
+{n:165,p:12,w:"the situation is incrementaly getting out of her hand",r:"The situation is gradually getting out of hand",t:["v","i","s"],wds:[],e:[{t:"i",l:"ИДИОМА",x:"out of her hand→out of hand — без притяжательного"},{t:"s",l:"ОРФОГРАФИЯ",x:"incrementaly→incrementally"}]},
+{n:166,p:12,w:"",r:"leaving early was a good call ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"a good call = правильное решение ✓"}]},
+{n:167,p:12,w:"",r:"you are supposed to finish this today ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"be supposed to = должен(по договорённости) ✓"}]},
+{n:168,p:12,w:"",r:"money is a strong incentive ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"incentive = стимул ✓"}]},
+{n:169,p:12,w:"he has a respectful passasion for learning some new technics to upskill his abilities and seeming as a hero on eyes of girls",r:"He has a genuine passion for learning new techniques to develop his skills",t:["v","s"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"respectful→genuine; technics→techniques; on eyes of→in the eyes of"},{t:"s",l:"ОРФОГРАФИЯ",x:"passasion→passion"}]},
+{n:170,p:12,w:"",r:"plants absorb water ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"✓"}]},
+{n:171,p:12,w:"",r:"he walked away from the deal ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"walk away from = отказаться от ✓"}]},
+{n:172,p:12,w:"his petulance annoyed everyone",r:"His petulance annoyed everyone ✓",t:["o"],wds:["petulance"],e:[{t:"o",l:"ВЕРНО",x:"petulance = капризность ✓"}]},
+{n:173,p:12,w:"",r:"i prefer tea as opposed to coffee in the mornings ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"as opposed to = в отличие от ✓"}]},
+{n:174,p:12,w:"she tucked her baby in the bed",r:"She tucked her baby into bed",t:["p"],wds:[],e:[{t:"p",l:"ПРЕДЛОГ",x:"in the bed→into bed"}]},
+{n:175,p:12,w:"It takes rougly two hours to get there",r:"It takes roughly two hours to get there",t:["s"],wds:[],e:[{t:"s",l:"ОРФОГРАФИЯ",x:"rougly→roughly"}]},
+{n:176,p:13,w:"she standed by her friends during the whole / entire ordeal / crucible / hardship",r:"She stood by her friends throughout the whole ordeal",t:["g"],wds:["ordeal"],e:[{t:"g",l:"НЕПРАВ. ГЛАГОЛ",x:"standed→stood — stand→stood→stood"}]},
+{n:177,p:14,w:"His decision had irreversible circumstances",r:"His decision had irreversible consequences",t:["v"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"circumstances=обстоятельства→consequences=последствия"}]},
+{n:178,p:14,w:"",r:"She closed the door quietly ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"Наречие после объекта — верная позиция ✓"}]},
+{n:179,p:14,w:"",r:"He has got his eye on her ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"have an eye on = наблюдать/интересоваться ✓"}]},
+{n:180,p:14,w:"",r:"Don't worry any longer / anymore — I will take it from here ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"anymore/any longer = больше. take it from here ✓"}]},
+{n:181,p:14,w:"she indulged in a long bath after a heavy / draining / nailed / worn out work week",r:"She indulged in a long bath after a draining / exhausting work week",t:["v"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"nailed/worn out не подходят→draining/exhausting"}]},
+{n:182,p:14,w:"count me in a trip",r:"Count me in on the trip",t:["p"],wds:[],e:[{t:"p",l:"ПРЕДЛОГ",x:"count me in ON the trip"}]},
+{n:183,p:14,w:"",r:"the plan is contingent on the weather ✓",t:["o"],wds:["contingent"],e:[{t:"o",l:"ВЕРНО",x:"contingent on ✓"}]},
+{n:184,p:14,w:"",r:"it worked out that way no offense ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"no offense = без обид ✓"}]},
+{n:185,p:14,w:"",r:"she is my closest confidant ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"confidant(сущ.) = доверенное лицо ✓"}]},
+{n:186,p:14,w:"the fake news proliferate quickly on social media",r:"Fake news proliferates quickly on social media",t:["g"],wds:["proliferate"],e:[{t:"g",l:"СОГЛАСОВАНИЕ",x:"proliferate→proliferates — fake news ед.ч."}]},
+{n:187,p:14,w:"when I opened the old photo album several handwritten letters fell out of the page opening / revealing a hidden / low key / sneaking / stealthy family story",r:"When I opened the old photo album, several handwritten letters fell out from between the pages, revealing a long-buried family secret",t:["v"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"low key/sneaking/stealthy не подходят→hidden/long-buried; page opening→from between the pages"}]},
+{n:188,p:14,w:"despite her petite frame she is experienced master of martial art who has won numerous national championships",r:"Despite her petite frame, she is an experienced master of martial arts who has won numerous national championships",t:["g"],wds:[],e:[{t:"g",l:"АРТИКЛЬ",x:"an experienced; martial arts мн.ч."}]},
+{n:189,p:14,w:"",r:"we should confront our fears to overcome them ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"confront fears head-on ✓"}]},
+{n:190,p:15,w:"",r:"this picture vividly captures a resilient and adaptable outlook on life ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"viable/durable/agile не подходят для 'view of life' → resilient/adaptable ✓"}]},
+{n:191,p:16,w:"",r:"we decided to head out to avoid the morning traffic ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"head out = выдвинуться; avoid + noun ✓"}]},
+{n:192,p:16,w:"",r:"progress requires incremental attempts / efforts ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"incremental efforts = пошаговые усилия ✓"}]},
+{n:193,p:16,w:"",r:"they are the rightful descendants / heirs ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"rightful heir = законный наследник ✓"}]},
+{n:194,p:16,w:"",r:"they performed one at a time ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"one at a time = по одному ✓"}]},
+{n:195,p:16,w:"",r:"he seemed shabby ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"shabby = потрёпанный ✓"}]},
+{n:196,p:16,w:"",r:"she worked up the courage to speak in public ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"work up the courage = собраться с духом ✓"}]},
+{n:197,p:16,w:"",r:"there was an oversight on my part ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"oversight = непреднамеренная ошибка. on my part ✓"}]},
+{n:198,p:16,w:"I want to flag an error on my end in the report",r:"I want to flag an error in the report — it's on my end",t:["v"],wds:[],e:[{t:"v",l:"ПОРЯДОК",x:"порядок слов неловкий — лучше разделить"}]},
+{n:199,p:16,w:"She was impassive after the meeting with his friends",r:"She was impassive after the meeting with his friends ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"impassive = невозмутимый ✓"}]},
+{n:200,p:16,w:"She felt shout out by her friends",r:"She felt shut out by her friends",t:["v"],wds:[],e:[{t:"v",l:"ПАРОНИМЫ",x:"shout out=кричать→shut out=исключить"}]},
+{n:201,p:17,w:"",r:"I am not buying it — it sounds fishy ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"not buying it = не верю. fishy ✓"}]},
+{n:202,p:17,w:"",r:"he is very observant and notices everything ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"observant = наблюдательный ✓"}]},
+{n:203,p:17,w:"the media gave an exaggerated version of events",r:"The media gave an exaggerated version of events ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"exaggerated/sensationalised. the media ✓"}]},
+{n:204,p:17,w:"",r:"he slept as snug as a bug in a rug ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"Рифмованная идиома ✓"}]},
+{n:205,p:18,w:"",r:"be mindful of others around you ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"mindful OF — верный предлог ✓"}]},
+{n:206,p:18,w:"the conditions in the camp was rotten / deplorable",r:"The conditions in the camp were rotten / deplorable",t:["g"],wds:["deplorable"],e:[{t:"g",l:"СОГЛАСОВАНИЕ",x:"conditions was→conditions were"}]},
+{n:207,p:18,w:"",r:"we are going to hike up the mountain this weekend — sounds neat ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"hike up ✓"}]},
+{n:208,p:18,w:"",r:"the submarine submerged silently beneath the waves ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"submerge beneath the waves ✓"}]},
+{n:209,p:18,w:"at first glanse everything looked normal but the details were wrong",r:"At first glance, everything looked normal, but the details were off",t:["s","v"],wds:[],e:[{t:"s",l:"ОРФОГРАФИЯ",x:"glanse→glance"},{t:"v",l:"ЛЕКСИКА",x:"were wrong→were off — более естественно"}]},
+{n:210,p:18,w:"in terms of academic achievements the school entered / ranked / accepted among the top five",r:"In terms of academic achievements, the school ranked among the top five",t:["v"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"entered/accepted→ranked — для рейтингов"}]},
+{n:211,p:18,w:"her petulance annoyed everyone",r:"Her petulance annoyed everyone ✓",t:["o"],wds:["petulance"],e:[{t:"o",l:"ВЕРНО",x:"✓"}]},
+{n:212,p:18,w:"he has won thanks to his cheer endurance",r:"He won thanks to his sheer endurance",t:["v"],wds:["sheer"],e:[{t:"v",l:"ПАРОНИМЫ",x:"cheer→sheer — абсолютный(усилитель)"}]},
+{n:213,p:18,w:"",r:"can you help me out ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"help me out ✓"}]},
+{n:214,p:18,w:"",r:"there is a feud between them ✓",t:["o"],wds:["feud"],e:[{t:"o",l:"ВЕРНО",x:"feud = давняя вражда. C1 ✓"}]},
+{n:215,p:18,w:"this task is time sensitive that requires all your attention",r:"This is a time-sensitive task that requires your full attention",t:["g","v"],wds:[],e:[{t:"g",l:"ДЕФИС",x:"time-sensitive через дефис"},{t:"v",l:"КОЛЛОКАЦИЯ",x:"all your attention→your full attention"}]},
+{n:216,p:18,w:"",r:"you never know what might happen in just a second ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"✓"}]},
+{n:217,p:18,w:"",r:"it can be classified as a rare case ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"✓"}]},
+{n:218,p:18,w:"",r:"hang on a second I will check ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"hang on = подожди ✓"}]},
+{n:219,p:18,w:"",r:"can you give me a hand with my issue ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"give me a hand = помоги ✓"}]},
+{n:220,p:18,w:"",r:"sorry it slipped my mind to call you ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"slipped my mind = вылетело из головы ✓"}]},
+{n:221,p:19,w:"he grabbedhold of her hand heavily",r:"He grabbed hold of her hand firmly",t:["s","v"],wds:[],e:[{t:"s",l:"ОРФОГРАФИЯ",x:"grabbedhold→grabbed hold(пробел)"},{t:"v",l:"ЛЕКСИКА",x:"heavily→firmly/tightly"}]},
+{n:222,p:19,w:"",r:"the movie flopped at the box office ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"flop at the box office = провалиться в прокате ✓"}]},
+{n:223,p:19,w:"",r:"the building remained intact ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"intact = нетронутый ✓"}]},
+{n:224,p:19,w:"",r:"she always speaks her mind ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"speak her mind = говорит что думает ✓"}]},
+{n:225,p:19,w:"I can;t stay awake I have been up my legs since four",r:"I can't stay awake — I have been on my feet since four",t:["i","s"],wds:[],e:[{t:"i",l:"ИДИОМА",x:"up my legs→on my feet = на ногах"},{t:"s",l:"ОРФОГРАФИЯ",x:"can;t→can't"}]},
+{n:226,p:19,w:"that was a crafty move nobody saw it coming",r:"That was a crafty move — nobody saw it coming ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"crafty = хитрый. nobody saw it coming ✓"}]},
+{n:227,p:19,w:"Old feelings resurfaced when he saw her again [Past Perfect?]",r:"Old feelings resurfaced when he saw her again ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"Past Simple верен. Past Perfect — только если важно показать предшествование"}]},
+{n:228,p:19,w:"",r:"she is my closest confidant ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"confidant(сущ.) = доверенное лицо ✓"}]},
+{n:229,p:19,w:"she indulged in a long bath after a heavy / draining work week",r:"She indulged in a long bath after a draining / exhausting work week ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"draining/exhausting ✓"}]},
+{n:230,p:19,w:"count me in a trip",r:"Count me in on the trip",t:["p"],wds:[],e:[{t:"p",l:"ПРЕДЛОГ",x:"count me in ON the trip"}]},
+{n:231,p:20,w:"",r:"the plan is contingent on the weather ✓",t:["o"],wds:["contingent"],e:[{t:"o",l:"ВЕРНО",x:"✓"}]},
+{n:232,p:20,w:"",r:"no offense it was just business ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"no offense ✓"}]},
+{n:233,p:20,w:"",r:"she is my closest confidant ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"✓"}]},
+{n:234,p:20,w:"the whole crew come to help with the move",r:"The whole crew came to help with the move",t:["g"],wds:[],e:[{t:"g",l:"ВРЕМЯ",x:"come→came — Past Simple"}]},
+{n:235,p:20,w:"something seems amiss",r:"Something seems amiss ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"amiss = что-то не так. Только предикативно ✓"}]},
+{n:236,p:20,w:"They started embarking on a two year research project",r:"They embarked on a two-year research project",t:["v","g"],wds:[],e:[{t:"v",l:"ТАВТОЛОГИЯ",x:"started embarking→embarked on"},{t:"g",l:"ДЕФИС",x:"two-year"}]},
+{n:237,p:21,w:"His decision had irreversible circumstances",r:"His decision had irreversible consequences",t:["v"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"circumstances→consequences"}]},
+{n:238,p:21,w:"",r:"She closed the door quietly ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"✓"}]},
+{n:239,p:21,w:"",r:"He has got his eye on her ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"✓"}]},
+{n:240,p:21,w:"",r:"Come in one at a time ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"✓"}]},
+{n:241,p:21,w:"",r:"Don't be such a wuss ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"wuss = слабак ✓"}]},
+{n:242,p:21,w:"Harry Potter said to Severus Snape that He is a muss, a coward",r:"Harry Potter called Severus Snape a coward",t:["g","v"],wds:[],e:[{t:"g",l:"ПРЯМАЯ РЕЧЬ",x:"Смешение прямой и косвенной"},{t:"v",l:"ЛЕКСИКА",x:"muss не существует"}]},
+{n:243,p:21,w:"",r:"He wore shabby clothes ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"✓"}]},
+{n:244,p:21,w:"Yeao buddy you need to loosen up it just a competition",r:"Yeah, buddy — you need to loosen up, it's just a competition!",t:["s","g"],wds:[],e:[{t:"s",l:"ОРФОГРАФИЯ",x:"Yeao→Yeah"},{t:"g",l:"ПРОПУСК",x:"it's just"}]},
+{n:245,p:21,w:"",r:"The situation is infuriating ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"infuriating ✓"}]},
+{n:246,p:21,w:"",r:"in the grand scheme of things this mistake is minor ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"grand scheme of things ✓"}]},
+{n:247,p:22,w:"",r:"I will gladly help you ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"gladly — верная позиция наречия ✓"}]},
+{n:248,p:22,w:"",r:"The treasure was buried underground ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"✓"}]},
+{n:249,p:22,w:"An elite platoon was sent to resolve / accomplish the mission / opperation",r:"An elite platoon was sent to accomplish / carry out the mission",t:["v","s"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"resolve→accomplish/carry out"},{t:"s",l:"ОРФОГРАФИЯ",x:"opperation→operation"}]},
+{n:250,p:22,w:"",r:"From the start, the mission seemed / felt doomed ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"doomed = обречённый. seemed vs felt — оттенки ✓"}]},
+{n:251,p:22,w:"the USA consolidate the states into one country",r:"The USA consolidated the states into one country",t:["g"],wds:[],e:[{t:"g",l:"ВРЕМЯ",x:"consolidate→consolidated — Past Simple"}]},
+{n:252,p:22,w:"during brainstroming session it is crucial to let the ideas flow freely without judgment",r:"During a brainstorming session, it is crucial to let ideas flow freely without judgement ✓",t:["s"],wds:[],e:[{t:"s",l:"ОРФОГРАФИЯ",x:"brainstroming→brainstorming"}]},
+{n:253,p:22,w:"let us whip up some food for dinner",r:"Let's whip up some food for dinner ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"whip up = быстро приготовить ✓"}]},
+{n:254,p:22,w:"He felt as an outcast at his new school",r:"He felt like an outcast at his new school",t:["g","x"],wds:[],e:[{t:"x",l:"⚠ ПАТТЕРН ×5",x:"felt as→felt LIKE — всегда feel like + noun!"}]},
+{n:255,p:22,w:"he has been snoozing for two hours so don't bother him",r:"He has been snoozing for two hours, so don't bother him ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"Present Perfect Continuous + for ✓"}]},
+{n:256,p:22,w:"i can't believe that she pulled it off the event was maginificent",r:"I can't believe she pulled it off — the event was magnificent!",t:["s"],wds:[],e:[{t:"s",l:"ОРФОГРАФИЯ",x:"maginificent→magnificent"}]},
+{n:257,p:23,w:"",r:"the enemies' army occupied the city for three years → The enemy army occupied the city",t:["g"],wds:[],e:[{t:"g",l:"ЛЕКСИКА",x:"enemies' army→the enemy army — собирательное"}]},
+{n:258,p:23,w:"that is pretty slick how did you do that so rapidly",r:"That was pretty slick — how did you do that so quickly?",t:["v"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"rapidly=формальное→quickly для разговорного"}]},
+{n:259,p:23,w:"her magnificent legacy became the school that she had founded",r:"The school she founded became her magnificent legacy",t:["v"],wds:[],e:[{t:"v",l:"ЛОГИКА",x:"legacy не становится школой — школа становится наследием"}]},
+{n:260,p:23,w:"",r:"her persistent efforts finally paid off ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"✓"}]},
+{n:261,p:23,w:"",r:"come on lighten up it was just a joke ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"lighten up = расслабься ✓"}]},
+{n:262,p:23,w:"",r:"let's stop there for today / call it a day ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"stop there / call it a day ✓"}]},
+{n:263,p:23,w:"his versatility as a acter made him perfect for the main role",r:"His versatility as an actor made him perfect for the lead role",t:["s","g","v"],wds:[],e:[{t:"s",l:"ОРФОГРАФИЯ",x:"acter→actor"},{t:"g",l:"АРТИКЛЬ",x:"a acter→an actor"},{t:"v",l:"ЛЕКСИКА",x:"main role→lead role"}]},
+{n:264,p:24,w:"",r:"It sounds too good to be true — what's the catch? ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"too good to be true; what's the catch ✓"}]},
+{n:265,p:24,w:"",r:"what in the world is taking her so long? I've been waiting for two hours! ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"what in the world = эвфемизм ✓"}]},
+{n:266,p:24,w:"",r:"We will play it by ear ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"play it by ear ✓"}]},
+{n:267,p:24,w:"I can distinguish her voice from her sister voice",r:"I can distinguish her voice from her sister's voice",t:["g"],wds:[],e:[{t:"g",l:"ПАДЕЖ",x:"her sister voice→her sister's voice"}]},
+{n:268,p:24,w:"the mission required / call off stealth",r:"The mission required / called for stealth",t:["i"],wds:[],e:[{t:"i",l:"ФРАЗ. ГЛАГОЛ",x:"call off=отменить→call for=требовать"}]},
+{n:269,p:24,w:"They pinpointed the whereabouts where gold are buried underground",r:"They pinpointed the location where the gold was buried",t:["v","g"],wds:[],e:[{t:"v",l:"ТАВТОЛОГИЯ",x:"whereabouts where→the location"},{t:"g",l:"СОГЛАСОВАНИЕ",x:"gold are→gold was"}]},
+{n:270,p:24,w:"",r:"he smacked his wife's backside in front of their friends ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"his wife (не her wife) ✓"}]},
+{n:271,p:24,w:"the bad end of the movie took away from an otherwise great film",r:"The weak ending took away from an otherwise great film",t:["v"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"bad end→weak ending — для фильмов ending"}]},
+{n:272,p:24,w:"She inherited her grandma's house and her love of / keen of cooking",r:"She inherited her grandmother's house and her love of cooking",t:["v"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"keen of→keen ON — другой предлог у keen"}]},
+{n:273,p:24,w:"the youth generetions are permanently glued to their phones that results in addiction",r:"Younger generations are constantly glued to their phones, which results in addiction to technology",t:["g","s"],wds:[],e:[{t:"g",l:"МЕСТОИМ",x:"that results→which results"},{t:"s",l:"ОРФОГРАФИЯ",x:"generetions→generations"}]},
+{n:274,p:24,w:"when Avatar Aang got away from life Avatar Kora took charge the army and stand up for safety her folks",r:"When Avatar Aang passed away, Avatar Korra took command of the army and stood up for the safety of her people",t:["v","g"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"got away from life→passed away; Kora→Korra; took charge the army→took command of"},{t:"g",l:"ВРЕМЯ",x:"stand up→stood up"}]},
+{n:275,p:24,w:"it was hard to come by what you asked for before",r:"What you asked for was hard to come by",t:["v"],wds:[],e:[{t:"v",l:"ПОРЯДОК",x:"лучше: What you asked for was hard to come by"}]},
+{n:276,p:25,w:"",r:"that was pretty slick — maybe we can do that again ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"✓"}]},
+{n:277,p:25,w:"do you know what the difference between this two words cranky and crabby asked an apprentice who hided behind the door",r:"\"Do you know what the difference between these two words — cranky and crabby — is?\" asked the apprentice who was hiding behind the door",t:["g","s"],wds:[],e:[{t:"g",l:"НЕПРАВ. ГЛАГОЛ",x:"hided→hid (hide→hid→hidden)"},{t:"g",l:"МЕСТОИМ",x:"this two→these two — мн.ч."}]},
+{n:278,p:25,w:"",r:"she was jealous of her sister's success ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"jealous OF = верный предлог ✓"}]},
+{n:279,p:25,w:"she enrolled to harvard preliminary courses",r:"She enrolled in Harvard's preparatory courses",t:["p","v"],wds:[],e:[{t:"p",l:"ПРЕДЛОГ",x:"enrolled to→enrolled IN"},{t:"v",l:"ЛЕКСИКА",x:"preliminary→preparatory; Harvard с заглавной"}]},
+{n:280,p:25,w:"keep in mind success doesn't come for a day it will take some time",r:"Keep in mind — success doesn't come in a day; it will take time",t:["p"],wds:[],e:[{t:"p",l:"ПРЕДЛОГ",x:"come for a day→come IN a day — in=за(срок)"}]},
+{n:281,p:26,w:"",r:"I couldn't get a hold of him ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"get a hold of = связаться ✓"}]},
+{n:282,p:26,w:"",r:"Let's get down to work ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"get down to work = взяться за работу ✓"}]},
+{n:283,p:26,w:"they had to alter the design concept at the beginning to the end to appropriate the requirements",r:"They had to alter the design concept from beginning to end to meet the requirements",t:["v","p"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"to appropriate→to meet the requirements"},{t:"p",l:"ПРЕДЛОГ",x:"at the beginning to→from beginning to end"}]},
+{n:284,p:26,w:"He embraced his gesture with joy",r:"He welcomed / received the gesture with joy",t:["v"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"embrace a gesture нестандартно→welcomed/received"}]},
+{n:285,p:26,w:"",r:"It was so muggy that my shirt was soaked within minutes ✓",t:["o"],wds:["muggy"],e:[{t:"o",l:"ВЕРНО",x:"muggy = душный ✓"}]},
+{n:286,p:26,w:"The shower will be expected in the afternoon",r:"Showers are expected in the afternoon",t:["g"],wds:[],e:[{t:"g",l:"АРТИКЛЬ+ВРЕМЯ",x:"The shower will be expected→Showers are expected"}]},
+{n:287,p:26,w:"My book editor is so nitpicky she corrected / tweaked every comma",r:"My book editor is so nitpicky she corrected / tweaked every single comma ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"nitpicky ✓"}]},
+{n:288,p:27,w:"",r:"don't take his words at face value ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"at face value ✓"}]},
+{n:289,p:27,w:"",r:"I am not buying it — it sounds fishy / suspicious / dodgy ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"not buying it; dodgy(орфография dudgy→dodgy) ✓"}]},
+{n:290,p:27,w:"",r:"He is very observant and notices everything ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"✓"}]},
+{n:291,p:27,w:"",r:"the media gave an exaggerated version of events ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"✓"}]},
+{n:292,p:27,w:"he slept as snug as a bug in a rug",r:"He slept as snug as a bug in a rug ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"Рифмованная идиома ✓"}]},
+{n:293,p:28,w:"",r:"as long as you are here, I will follow the instructions ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"as long as + Present Simple → Future ✓"}]},
+{n:294,p:28,w:"",r:"it was a riotous nightmare ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"riotous = буйный, хаотичный ✓"}]},
+{n:295,p:28,w:"",r:"The cooker is turned off ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"Пассив состояния ✓"}]},
+{n:296,p:28,w:"",r:"Diamonds consist of carbon / are made of carbon ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"consist of vs made of vs made from ✓"}]},
+{n:297,p:28,w:"We don't have but we will play it by ear",r:"We don't have a plan, but we'll play it by ear",t:["g"],wds:[],e:[{t:"g",l:"АРТИКЛЬ",x:"don't have→don't have A PLAN"}]},
+{n:298,p:28,w:"",r:"It is no big deal / no biggie / no sweat ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"✓"}]},
+{n:299,p:28,w:"",r:"they also rounded up the animals ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"round up ✓"}]},
+{n:300,p:28,w:"a little forethought we could have avoided the whole mess / had been able to avoid",r:"With a little forethought, we could have avoided the whole mess",t:["p"],wds:["forethought"],e:[{t:"p",l:"ПРЕДЛОГ",x:"WITH a little forethought"}]},
+{n:301,p:28,w:"",r:"don't tell her anything she is a total blabbermouth ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"blabbermouth ✓"}]},
+{n:302,p:28,w:"",r:"time goes by quickly nowadays ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"goes by ✓"}]},
+{n:303,p:28,w:"",r:"they have mutual respect for each other ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"mutual respect ✓"}]},
+{n:304,p:28,w:"although the startup's package of salary is enticing the lack of guarantee of job security and long hours make it a risky proposition doesn't it",r:"Although the startup's salary package is enticing, the lack of job security and long hours make it a risky proposition — don't they?",t:["v","g"],wds:[],e:[{t:"v",l:"ЛЕКСИКА",x:"package of salary→salary package"},{t:"g",l:"QUESTION TAG",x:"make it...doesn't it→don't they? — мн.ч."}]},
+{n:305,p:28,w:"",r:"it is hard / difficult to gauge his reaction to it ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"gauge = оценить. C1 ✓"}]},
+{n:306,p:28,w:"",r:"We left for Paris via Berlin ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"left for + via ✓"}]},
+{n:307,p:28,w:"",r:"he felt intimidated entering the room full of experts ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"intimidated = оробевший ✓"}]},
+{n:308,p:28,w:"we need to durable materials that are capable of withstanding harsh weather",r:"We need durable materials capable of withstanding harsh weather",t:["g"],wds:[],e:[{t:"g",l:"ЛИШНЕЕ",x:"need to durable→need durable — to лишнее перед существительным"}]},
+{n:309,p:28,w:"the new team's coach reinvigorated the winning atmosphere of the whole team",r:"The new coach reinvigorated the winning atmosphere throughout the team",t:["v"],wds:["reinvigorate"],e:[{t:"v",l:"ЛЕКСИКА",x:"the new team's coach→the new coach; of the whole team→throughout"}]},
+{n:310,p:28,w:"let's stop on it in detail it is a crucial moment",r:"Let's dwell on this in detail — it's a crucial moment",t:["i","x"],wds:[],e:[{t:"x",l:"⚠ ПАТТЕРН ×4",x:"stop on it→dwell on this"}]},
+{n:311,p:29,w:"",r:"the thought of mocking him is abhorrent to her ✓",t:["o"],wds:["abhorrent"],e:[{t:"o",l:"ВЕРНО",x:"abhorrent = отвратительный. the thought of + gerund ✓"}]},
+{n:312,p:29,w:"after the disappointment of the last attempt she felt difficulties to get yourself to try again",r:"After the disappointment of her last attempt, she found it difficult to bring herself to try again",t:["g","v"],wds:[],e:[{t:"g",l:"ЛИЦО",x:"felt difficulties to get yourself→couldn't bring herself"},{t:"v",l:"КОНСТРУКЦИЯ",x:"bring oneself to do = заставить себя"}]},
+{n:313,p:29,w:"",r:"she relished the opportunity to travel ✓",t:["o"],wds:["relish"],e:[{t:"o",l:"ВЕРНО",x:"relish ✓"}]},
+{n:314,p:29,w:"",r:"she relished travelling the world all year round ✓",t:["o"],wds:["relish"],e:[{t:"o",l:"ВЕРНО",x:"all year round ✓"}]},
+{n:315,p:29,w:"",r:"Unbeknownst to me, he had left for England ✓",t:["o"],wds:["unbeknownst"],e:[{t:"o",l:"ВЕРНО",x:"unbeknownst to ✓"}]},
+{n:316,p:29,w:"She is smart as a whip / sharp as a track",r:"She is smart as a whip / sharp as a tack",t:["i"],wds:[],e:[{t:"i",l:"ИДИОМА",x:"track→tack — острый гвоздик"}]},
+{n:317,p:29,w:"",r:"He twisted off the bottle cap ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"twisted off ✓"}]},
+{n:318,p:29,w:"there are the rigid rules here no exceptions",r:"The rules here are rigid — no exceptions",t:["g"],wds:[],e:[{t:"g",l:"АРТИКЛЬ",x:"there are the rigid rules→the rules here are rigid"}]},
+{n:319,p:29,w:"",r:"The new CEO took over the company last month ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"took over ✓"}]},
+{n:320,p:29,w:"Her answer was succinct one sentence perfectly clear she articulated and enunciated so clearly",r:"Her answer was succinct — one sentence, perfectly clear. She articulated and enunciated so clearly.",t:["o"],wds:["succinct"],e:[{t:"o",l:"ВЕРНО",x:"succinct = краткий. articulate vs enunciate — разные нюансы ✓"}]},
+{n:321,p:29,w:"",r:"just make nice with her parents for one evening you can do it → Just be nice to her parents ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"be nice to (make nice нестандартно) ✓"}]},
+{n:322,p:29,w:"he is diligent in his studies and studies hard while also he is working part time",r:"He is diligent in his studies and works hard while also working part-time",t:["v"],wds:[],e:[{t:"v",l:"ТАВТОЛОГИЯ",x:"diligent in studies + studies hard = дублирование; part-time через дефис"}]},
+{n:323,p:29,w:"",r:"good to be back home after the long trip ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"✓"}]},
+{n:324,p:29,w:"",r:"come on lighten up it was just a joke ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"lighten up ✓"}]},
+{n:325,p:29,w:"",r:"my book editor is so nitpicky she corrected every single comma ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"✓"}]},
+{n:326,p:29,w:"",r:"we need to get out of the forest before it gets dark ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"before it gets dark ✓"}]},
+{n:327,p:29,w:"",r:"Even with Snape muttering his countercurse [незаконченное]",t:["g"],wds:[],e:[{t:"g",l:"СТРУКТУРА",x:"Незаконченное предложение — нет главной части"}]},
+{n:328,p:29,w:"It'd be more useful if I do it as opposed to that one",r:"It would be more useful if I did it, as opposed to that one doing it",t:["g"],wds:[],e:[{t:"g",l:"2-й ТИП",x:"if I do→if I DID — 2-й тип условного"}]},
+{n:329,p:29,w:"",r:"it will be harmful to your health all around ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"all around/all round ✓"}]},
+{n:330,p:29,w:"",r:"It's a wrench to be separated for such a long time ✓",t:["o"],wds:[],e:[{t:"o",l:"ВЕРНО",x:"it's a wrench = мучительное расставание. C1 ✓"}]},
+{n:331,p:29,w:"",r:"the outcome of this action is contingent on your decision ✓",t:["o"],wds:["contingent"],e:[{t:"o",l:"ВЕРНО",x:"contingent on ✓"}]}
+];
+
+
+const WDB={
+"flabbergasted":{lv:"C1",def:"Ошеломлённый до крайности. После linking verb без 'as'!",rule:"✓ She looked flabbergasted\n❌ she looked as flabbergasted",rel:["downcast","wretched","impassive"]},
+"petulance":{lv:"C1",def:"Капризность, обидчивость. Прилагательное: petulant.",rule:"✓ Her petulance annoyed everyone",rel:["downcast"]},
+"disrupt":{lv:"B2",def:"Нарушить, прервать, дестабилизировать.",rule:"✓ operations were disrupted\n✓ noise disrupted the atmosphere",rel:["ferocity","overwhelm"]},
+"ordeal":{lv:"C1",def:"Тяжёлое испытание, мучительный опыт. Самое точное слово.",rule:"✓ throughout the whole ordeal\n✓ stood by him through the ordeal",rel:["wretched","deplorable","overwhelm"]},
+"reinvigorate":{lv:"C1",def:"Вдохнуть новую жизнь, придать сил.",rule:"✓ The coach reinvigorated the team\n✓ My solace reinvigorates me",rel:["buoyant","reinvigorate"]},
+"contingent":{lv:"C1",def:"Зависящий от. Всегда с предлогом ON!",rule:"✓ contingent ON the weather\n❌ contingent of/from",rel:[]},
+"ferocity":{lv:"C1",def:"Свирепость, ярость. Существительное от ferocious.",rule:"✓ struck with unexpected ferocity",rel:["disrupt","formidable"]},
+"cogent":{lv:"C1",def:"Убедительный, весомый (об аргументе). Формальное.",rule:"✓ put forward cogent arguments IN FAVOUR OF\n❌ in benefit for",rel:[]},
+"proliferate":{lv:"C1",def:"Стремительно распространяться. Fake news → ед.ч.!",rule:"✓ Fake news proliferates quickly\n❌ fake news proliferate",rel:["disrupt"]},
+"quench":{lv:"B2",def:"Утолить. Только физические метафоры! Не для страстей.",rule:"✓ quench his thirst\n✓ thirst FOR knowledge\n❌ quench your passion",rel:[]},
+"forethought":{lv:"C1",def:"Предусмотрительность. Существительное, не глагол!",rule:"✓ WITH a little forethought\n❌ forethought future events (нельзя как глагол)",rel:["epiphany"]},
+"epiphany":{lv:"C1",def:"Озарение, внезапное осознание.",rule:"✓ the idea came as an epiphany\n✓ a fateful epiphany",rel:["forethought"]},
+"scintillating":{lv:"C1",def:"Блистательный, искрящийся. Высокий регистр.",rule:"✓ the event was scintillating\n❌ scintilitaing (орфография!)",rel:["formidable","buoyant"]},
+"unbeknownst":{lv:"C1+",def:"Не ведая о. Редкое формально-литературное слово.",rule:"✓ Unbeknownst to him, she had already left\n✓ Unbeknownst to me, he left",rel:[]},
+"henceforth":{lv:"C1",def:"Отныне, с этого момента. Торжественное слово.",rule:"✓ Henceforth, he is the leader\n✓ Henceforth, you are no longer my friend",rel:[]},
+"buoyant":{lv:"C1",def:"Жизнерадостный, неунывающий.",rule:"✓ she remained buoyant and benevolent",rel:["reinvigorate","scintillating"]},
+"autumnal":{lv:"C1",def:"Осенний. Поэтическое прилагательное от autumn.",rule:"✓ a beautiful autumnal atmosphere\n❌ autamnal (орфография)",rel:[]},
+"deplorable":{lv:"C1",def:"Достойный осуждения, ужасающий. Формальное.",rule:"✓ conditions were deplorable",rel:["wretched","ordeal"]},
+"downcast":{lv:"B2",def:"Подавленный. ТОЛЬКО предикативно — не перед существительным!",rule:"✓ sat quietly downcast\n✓ He has been downcast lately\n❌ a downcast person",rel:["wretched","flabbergasted","petulance"]},
+"relish":{lv:"C1",def:"Наслаждаться, получать удовольствие. + gerund/noun.",rule:"✓ she relished the opportunity\n✓ she relishes doing this",rel:["buoyant"]},
+"formidable":{lv:"C1",def:"Внушительный, грандиозный.",rule:"✓ achieve something formidable\n✓ a formidable opponent",rel:["ferocity","scintillating"]},
+"incessant":{lv:"C1",def:"Непрекращающийся, беспрестанный.",rule:"✓ an incessant day\n❌ incessent (орфография)",rel:[]},
+"wretched":{lv:"C1",def:"Несчастный, убитый горем.",rule:"✓ felt wretched after hearing the news",rel:["downcast","ordeal","deplorable"]},
+"overwhelm":{lv:"B2",def:"Подавлять, захлёстывать. overwhelming = подавляющий.",rule:"✓ the fatigue was overwhelming\n✓ overwhelmed by the situation",rel:["ordeal","disrupt"]},
+"abhorrent":{lv:"C1",def:"Отвратительный, внушающий отвращение.",rule:"✓ The thought of mocking him is abhorrent\nСтруктура: the thought of + gerund",rel:["deplorable","wretched"]},
+"succinct":{lv:"C1",def:"Краткий, лаконичный.",rule:"✓ Her answer was succinct\n✓ a succinct explanation",rel:[]},
+"muggy":{lv:"B2",def:"Душный, влажный и жаркий (о погоде).",rule:"✓ It was so muggy that my shirt was soaked",rel:[]},
+"sheer":{lv:"B2",def:"Абсолютный, чистый (усилитель). НЕ путать с cheer!",rule:"✓ sheer endurance / sheer determination\n❌ cheer endurance (распространённая ошибка!)",rel:[]},
+"feud":{lv:"C1",def:"Давняя вражда, затяжной конфликт.",rule:"✓ there is a feud between them",rel:[]},
+"prevalent":{lv:"C1",def:"Распространённый, преобладающий.",rule:"✓ This kind of book is prevalent in my country",rel:[]},
+"impassive":{lv:"C1",def:"Невозмутимый, бесстрастный. О внешнем выражении.",rule:"✓ She was impassive after the meeting\n(внешне бесстрастный ≠ indifferent=безразличный)",rel:["downcast","flabbergasted"]},
+"intimidate":{lv:"B2",def:"Запугивать, внушать робость.",rule:"✓ He felt intimidated entering the room\n✓ tried to intimidate his opponent",rel:[]},
+"resilient":{lv:"C1",def:"Стойкий, упругий, способный восстанавливаться.",rule:"✓ she remained resilient\n✓ a resilient outlook on life",rel:["buoyant","formidable"]},
+"invoke":{lv:"C1",def:"Призывать, апеллировать к. Формальное.",rule:"✓ invoke a rule\n✓ invoke someone's name",rel:[]},
+"infer":{lv:"C1",def:"Делать вывод, заключать из чего-то.",rule:"✓ We can infer from the data\n(infer ≠ imply: infer=вывод, imply=подразумевать)",rel:[]},
+"gauge":{lv:"C1",def:"Оценивать, измерять, определять.",rule:"✓ it is hard to gauge his reaction\n✓ gauge the situation",rel:[]},
+"scrutinise":{lv:"C1",def:"Тщательно изучать, детально рассматривать.",rule:"✓ scrutinise the evidence\n✓ under scrutiny",rel:[]},
+"meticulous":{lv:"C1",def:"Скрупулёзный, тщательный до мелочей.",rule:"✓ meticulous attention to detail\n✓ a meticulous researcher",rel:[]},
+"eloquent":{lv:"C1",def:"Красноречивый, убедительный в речи.",rule:"✓ an eloquent speech\n✓ eloquently expressed",rel:[]},
+"discern":{lv:"C1",def:"Различать, замечать с трудом.",rule:"✓ discern a pattern\n✓ hard to discern",rel:["gauge"]},
+"pragmatic":{lv:"C1",def:"Прагматичный, практичный.",rule:"✓ a pragmatic approach\n✓ pragmatic solutions",rel:[]},
+"alleviate":{lv:"C1",def:"Облегчать, смягчать (боль/проблему).",rule:"✓ alleviate the pain\n✓ measures to alleviate stress",rel:[]},
+"consolidate":{lv:"C1",def:"Объединять, укреплять, консолидировать.",rule:"✓ consolidate the states\n✓ consolidate power",rel:[]},
+"ambiguous":{lv:"C1",def:"Двусмысленный, неоднозначный.",rule:"✓ an ambiguous statement\n✓ ambiguous results",rel:["discern"]},
+"mitigate":{lv:"C1",def:"Смягчать, уменьшать (последствия).",rule:"✓ mitigate the risks\n✓ mitigating circumstances",rel:["alleviate"]},
+"perpetuate":{lv:"C1",def:"Увековечивать, продолжать без конца.",rule:"✓ perpetuate a myth\n✓ perpetuate inequality",rel:[]},
+"viable":{lv:"C1",def:"Жизнеспособный, осуществимый. ДЕЛОВОЙ термин.",rule:"✓ a viable plan / solution\n❌ a viable view of life (не подходит для личных качеств)",rel:["pragmatic"]},
+"contingency":{lv:"C1",def:"Непредвиденное обстоятельство. contingency plan = план Б.",rule:"✓ a contingency plan\n✓ in case of contingency",rel:["contingent"]},
+"exacerbate":{lv:"C1",def:"Усугублять, обострять.",rule:"✓ exacerbate the problem\n✓ exacerbate tensions",rel:[]},
+"perilous":{lv:"C1",def:"Опасный, рискованный (формальное).",rule:"✓ a perilous journey\n✓ perilous conditions",rel:[]},
+"redemption":{lv:"C1",def:"Искупление, спасение.",rule:"✓ He sought redemption\n✓ a chance of redemption",rel:[]},
+"scour":{lv:"C1",def:"Прочёсывать, тщательно искать.",rule:"✓ she scoured the internet for hours\n✓ scoured the rubble",rel:["scrutinise"]},
+"betrothal":{lv:"C1",def:"Помолвка (формальное/архаичное).",rule:"✓ Their betrothal was arranged by their families",rel:[]},
+"vengeance":{lv:"C1",def:"Месть, возмездие. Сильнее чем revenge.",rule:"✓ with a vengeance\n✓ seek vengeance",rel:[]},
+"diligent":{lv:"B2",def:"Усердный, прилежный, трудолюбивый.",rule:"✓ diligent in his studies\n✓ a diligent student",rel:["meticulous"]},
+};
+
+
+const PATS=[
+{ic:"🔴",ti:'"What" после существительного = ВСЕГДА ОШИБКА',cnt:"×6",bad:["idea what she had","office what is located","story what concludes","station what was built"],good:["idea that she had","office which is located","story that concludes","station that was built"],note:"// После существительного → who/which/that. НИКОГДА what!"},
+{ic:"🔴",ti:'Feel like — пропуск "like"',cnt:"×5",bad:["felt a burden","felt third wheel","felt an outcast","felt insignificance"],good:["felt like a burden","felt like a third wheel","felt like an outcast","felt insignificant"],note:"// feel like + noun — всегда с like"},
+{ic:"🟠",ti:"Stop on it — не существует (исчезло после ч.21)",cnt:"×4",bad:["let's stop on it","stop on a concept"],good:["let's stop there","dwell on it","settle on the concept"],note:"// ✓ Усвоено к части 21"},
+{ic:"🟠",ti:"While вместо Before",cnt:"×3",bad:["tackle while it gets worse","while evidence didn't emerge"],good:["tackle before it gets worse","until the evidence emerged"],note:"// while = одновременность / before = до события"},
+{ic:"🟡",ti:"Притяжательный падеж — 11 случаев",cnt:"×11",bad:["her sister voice","knowledge's thirst","her parents memorizes"],good:["her sister's voice","thirst FOR knowledge","her parents' memories"],note:"// Одушевлённый → 's / Неодушевлённый → предлог"},
+{ic:"🟡",ti:"Stative verbs в Continuous",cnt:"×2",bad:["had been knowing"],good:["had known"],note:"// know/love/believe/want/own — НИКОГДА в Continuous"},
+{ic:"🟡",ti:"Budged his sit",cnt:"×4",bad:["budged his sit","penultimate sits"],good:["gave up his seat","penultimate seat"],note:"// sit = глагол / seat = существительное"},
+{ic:"🟡",ti:"Cheer вместо Sheer",cnt:"×2",bad:["cheer endurance"],good:["sheer endurance"],note:"// sheer = абсолютный / cheer = радость"},
+{ic:"🟢",ti:"Согласование — значительно улучшилось",cnt:"",bad:["operations was","fake news proliferate"],good:["operations were","fake news proliferates"],note:"// Улучшение с частей 8-10"},
+{ic:"🟢",ti:"Предлоги фраз. глаголов — улучшилось",cnt:"",bad:["abide the rules","immersed into"],good:["abide by the rules","immersed in"],note:"// 9 ошибок → 1-2 на блок"},
+{ic:"🟢",ti:"Контаминация выражений",cnt:"",bad:["last straw of his patience","started embarking"],good:["the last straw","embarked on"],note:"// Смешение двух правильных = ошибка"},
+{ic:"✅",ti:"Capable of withstanding — ИСПРАВЛЕНО к ч.22!",cnt:"",bad:["capable of withstand"],good:["capable of withstanding"],note:"// Усвоено ✓"},
+];
+
+const RLS=[
+{n:"01",ti:"WHAT после существительного = ОШИБКА (×6)",bad:["idea what she had"],good:["idea that she had"],note:"Главная системная ошибка!"},
+{n:"02",ti:"Feel like + noun",bad:["felt an outcast"],good:["felt like an outcast"],note:"5 повторений"},
+{n:"03",ti:"While vs Before",bad:["while it gets worse"],good:["before it gets worse"],note:"while = одновременность / before = до события"},
+{n:"04",ti:"Stative Verbs — никогда в Continuous",bad:["had been knowing"],good:["had known"],note:"know/love/believe/want/own"},
+{n:"05",ti:"Притяжательный падеж",bad:["her sister voice"],good:["her sister's voice"],note:"Одушевлённый → 's"},
+{n:"06",ti:"Every + единственное число",bad:["every meetings"],good:["every meeting"],note:"every + ед.ч. / all + мн.ч."},
+{n:"07",ti:"In vs Into",bad:["got in a car","immersed into"],good:["got into a car","immersed in"],note:"in = состояние / into = движение"},
+{n:"08",ti:"Born into",bad:["born this family"],good:["born into this family"],note:"фиксированный предлог"},
+{n:"09",ti:"Await без предлога",bad:["await for news"],good:["await news","wait for news"],note:"await = формальный без for"},
+{n:"10",ti:"Million без -s",bad:["66 millions years"],good:["66 million years"],note:"После числа — без -s"},
+{n:"11",ti:"Exceed vs Surpass",bad:["exceed other pupils"],good:["surpass other pupils"],note:"exceed = норму / surpass = людей"},
+{n:"12",ti:"Healthier (не more healthy)",bad:["more healthy"],good:["healthier"],note:"Одно/двусложные → -er"},
+{n:"13",ti:"Наречие — позиция",bad:["told explicitly them"],good:["explicitly told them"],note:"Не между глаголом и дополнением"},
+{n:"14",ti:"On the outskirts (не in)",bad:["in the outskirts"],good:["on the outskirts"],note:"Фиксированный предлог on"},
+{n:"15",ti:"Make a profit",bad:["got a profit"],good:["made a profit"],note:"make/generate/turn a profit"},
+{n:"16",ti:"Worth + gerund",bad:["worth to watch"],good:["worth watching"],note:"worth всегда + gerund"},
+{n:"17",ti:"Идиомы — фиксированные предлоги",bad:["mountain from molehill","attack to rivals"],good:["mountain out of molehill","attack on rivals"],note:"Предлог нельзя менять"},
+{n:"18",ti:"Bring oneself to do",bad:["felt difficulties to try"],good:["couldn't bring herself to try"],note:"Заставить себя"},
+{n:"19",ti:"In human history",bad:["of humans history"],good:["in human history"],note:"Фиксированная конструкция"},
+{n:"20",ti:"Re- = снова",bad:["resurfaced again"],good:["resurfaced"],note:"Приставка re- уже означает 'снова'"},
+];
+
+let cFilt='all', cSrch='';
+const TLM={g:'ГРАММ',v:'ЛЕКСИКА',i:'ИДИОМА',s:'ОРФОГР',p:'ПРЕДЛОГ',o:'ВЕРНО',x:'ПАТТЕРН'};
+
+function buildAll(){
+  buildCards(); buildSidebar(); buildPats(); buildWords(); buildRules(); buildProg();
+  document.getElementById('tc').textContent=S.length;
+  document.getElementById('vc').textContent=S.length+' / '+S.length;
+}
+
+function buildCards(){
+  const cw=document.getElementById('cw');
+  cw.innerHTML=S.map(s=>{
+    const wh=(s.wds&&s.wds.length)?`<div class="scwds"><span class="swlbl">СЛОВА:</span>${s.wds.map(w=>`<span class="wtag" onclick="openW('${w}');event.stopPropagation()">${w}</span>`).join('')}</div>`:'';
+    return `<div class="scard" data-tags="${s.t.join(' ')}" data-n="${s.n}" data-p="${s.p}">
+      <div class="schead" onclick="tog(this)">
+        <div class="scnum">${String(s.n).padStart(3,'0')}</div>
+        <div class="scsents">
+          ${s.w?`<div class="scw">${s.w}</div>`:''}
+          <div class="scr">${s.r}</div>
+          <div class="sctags">
+            ${s.t.map(t=>`<span class="sctag tg-${t}">${TLM[t]||t}</span>`).join('')}
+            <span class="sctag" style="background:rgba(124,106,247,0.1);color:#a78bfa;border:1px solid rgba(124,106,247,0.2)">Ч.${s.p}</span>
+          </div>
+        </div>
+        <div class="sctog">▸</div>
+      </div>
+      <div class="scbody">
+        <div class="scerrs">${s.e.map(e=>`<div class="scer"><span class="et et${e.t}">${e.l}</span><span>${e.x}</span></div>`).join('')}</div>
+        ${wh}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function buildSidebar(){
+  const sw=document.getElementById('sw');
+  const wkeys=Object.keys(WDB).sort();
+  sw.innerHTML='<div class="wlbl">Слова '+wkeys.length+'</div>'+
+    wkeys.map(w=>{
+      const cnt=S.filter(s=>(s.wds||[]).includes(w)).length;
+      return `<div class="wchip" onclick="openW('${w}')" id="wc-${w}">${w}<span class="wcnt">${cnt}</span></div>`;
+    }).join('');
+}
+
+function buildPats(){
+  document.getElementById('patg').innerHTML=PATS.map(p=>`
+    <div class="pc"><div class="picon">${p.ic}</div><div style="flex:1">
+      <div class="ptitle">${p.ti}${p.cnt?`<span class="pcnt">${p.cnt}</span>`:''}</div>
+      <div class="pexs">${p.bad.map(b=>`<span class="pb">${b}</span>`).join('')}${p.good.map(g=>`<span class="pg">${g}</span>`).join('')}</div>
+      <div class="pnote">${p.note}</div>
+    </div></div>`).join('');
+}
+
+function buildWords(){
+  const lc={'C1':'rgba(124,106,247,0.1)','C1+':'rgba(74,222,128,0.1)','B2':'rgba(96,165,250,0.1)'};
+  const lt={'C1':'#c4b5fd','C1+':'#86efac','B2':'#93c5fd'};
+  document.getElementById('wg').innerHTML=Object.entries(WDB).map(([k,v])=>{
+    const cnt=S.filter(s=>(s.wds||[]).includes(k)).length;
+    return `<div class="wc" onclick="openW('${k}')">
+      <div class="wctit">${k}</div>
+      <div class="wcmeta">
+        <span class="wccnt" style="background:${lc[v.lv]||'var(--s3)'};color:${lt[v.lv]||'var(--dim)'}">${v.lv}</span>
+        <span class="wccnt">×${cnt}</span>
+      </div>
+      <div class="wcdef">${v.def}</div>
+      <div class="wcrule">${v.rule.replace(/\n/g,'<br>').replace(/✓/g,'<span class="ok">✓</span>').replace(/❌/g,'<span class="no">❌</span>')}</div>
+    </div>`;
+  }).join('');
+}
+
+function buildRules(){
+  document.getElementById('rl').innerHTML=RLS.map(r=>`
+    <div class="rc"><div class="rnum">${r.n}</div><div style="flex:1">
+      <div class="rtit">${r.ti}</div>
+      <div class="rexs">${r.bad.map(b=>`<span class="pb">${b}</span>`).join('')}${r.good.map(g=>`<span class="pg">${g}</span>`).join('')}</div>
+      <div class="rnote">${r.note}</div>
+    </div></div>`).join('');
+}
+
+function buildProg(){
+  const ok=S.filter(s=>s.t.includes('o')).length;
+  document.getElementById('pro').innerHTML=`
+    <div class="pgrid">
+      <div class="pcard"><div class="ptitlep">Предложений</div><div class="pnum">${S.length}</div><div class="psub">из 400+ разобранных</div></div>
+      <div class="pcard"><div class="ptitlep">Верных</div><div class="pnum">${ok}</div><div class="psub">${Math.round(ok/S.length*100)}% от всех</div></div>
+      <div class="pcard"><div class="ptitlep">Слов</div><div class="pnum">${Object.keys(WDB).length}</div><div class="psub">в словаре</div></div>
+      <div class="pcard"><div class="ptitlep">Уровень</div><div class="pnum" style="color:var(--acc)">B2+</div><div class="psub">Цель: C1</div></div>
+    </div>
+    ${[['Грамматика','B1→B2',72,'#60a5fa'],['Лексика','B1+→C1',88,'#f59e0b'],['Идиомы','A2→C1',91,'#10b981'],['Орфография','B1→B2+',75,'#8b5cf6'],['Общий','B1→B2+',78,'#06b6d4']].map(([l,v,p,c])=>`
+    <div class="sb"><div class="sbrow"><span>${l}</span><span class="sbv">${v}</span></div><div class="sbtr"><div class="sbf" style="width:${p}%;background:${c}"></div></div></div>`).join('')}
+    <div class="tl">
+      ${[['Части 1–3','Базовый уровень','Много ошибок, но уже видна смелость.','B1','rgba(248,180,106,0.15)','#fcd34d'],
+      ['Части 4–8','Рост лексики','proliferate, cogent, flabbergasted. Первые идиомы.','B1+','rgba(248,180,106,0.15)','#fcd34d'],
+      ['Части 9–13','Переход на B2','Первые полностью верные предложения.','B2','rgba(96,165,250,0.15)','#93c5fd'],
+      ['Части 14–18','Стабилизация B2','40–50% верных. Идиомы уверенно.','B2','rgba(96,165,250,0.15)','#93c5fd'],
+      ['Части 19–22','Академические конструкции','forethought, epiphany, unbeknownst. 50%+ верных.','B2','rgba(96,165,250,0.15)','#93c5fd'],
+      ['Части 23–29 · Сейчас','Уверенный B2+','60–70% верных. Ошибки точечные.','B2+','rgba(124,106,247,0.15)','#c4b5fd'],
+      ['Цель','C1 — один шаг','which/that, feel like + noun, орфография сложных слов.','C1 ←','rgba(74,222,128,0.15)','#86efac'],
+      ].map(([lb,ti,de,b,bc,tc])=>`<div class="tli"><div class="tld"></div><div class="tll">${lb}</div><div class="tlti">${ti}</div><div class="tlde">${de}</div><span class="bdg" style="background:${bc};color:${tc};border:1px solid ${tc}40">${b}</span></div>`).join('')}
+    </div>`;
+}
+
+function navTo(p,el){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(x=>x.classList.remove('on'));
+  document.getElementById('pg-'+p).classList.add('on');
+  el.classList.add('on'); closeP();
+}
+
+function tog(h){
+  const b=h.nextElementSibling,tg=h.querySelector('.sctog');
+  b.classList.contains('open')?(b.classList.remove('open'),tg.textContent='▸'):(b.classList.add('open'),tg.textContent='▾');
+}
+
+function doFilt(btn,tag){
+  document.querySelectorAll('.ft').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on'); cFilt=tag; applyF();
+}
+
+function doSearch(q){ cSrch=q.toLowerCase(); applyF(); }
+
+function applyF(){
+  let v=0;
+  document.querySelectorAll('.scard').forEach(c=>{
+    const tags=c.dataset.tags||'', txt=c.textContent.toLowerCase();
+    const show=(cFilt==='all'||tags.includes(cFilt))&&(!cSrch||txt.includes(cSrch));
+    c.style.display=show?'block':'none';
+    if(show)v++;
+  });
+  document.getElementById('vc').textContent=v+' / '+S.length;
+}
+
+function openW(key){
+  const d=WDB[key]; if(!d) return;
+  document.querySelectorAll('.wchip').forEach(c=>c.classList.remove('on'));
+  const ch=document.getElementById('wc-'+key);
+  if(ch){ch.classList.add('on');ch.scrollIntoView({block:'nearest'});}
+  document.getElementById('wpt').textContent=key;
+  const lc={'C1':'rgba(124,106,247,0.15)','C1+':'rgba(74,222,128,0.15)','B2':'rgba(96,165,250,0.15)'};
+  const lt={'C1':'#c4b5fd','C1+':'#86efac','B2':'#93c5fd'};
+  document.getElementById('wpl').innerHTML=`<span class="wplvl" style="background:${lc[d.lv]||'var(--s2)'};color:${lt[d.lv]||'var(--dim)'};border:1px solid ${(lt[d.lv]||'var(--border)')}40">${d.lv}</span>`;
+  document.getElementById('wpd').textContent=d.def;
+  const sents=S.filter(s=>(s.wds||[]).includes(key));
+  let html='';
+  if(d.rule){
+    html+='<div class="wpsec">ПРАВИЛО</div>';
+    html+=`<div class="wprule">${d.rule.replace(/\n/g,'<br>').replace(/✓/g,'<span class="ok">✓</span>').replace(/❌/g,'<span class="no">❌</span>')}</div>`;
+  }
+  if(sents.length){
+    html+=`<div class="wpsec">ПРИМЕРЫ (${sents.length})</div>`;
+    sents.forEach(s=>{
+      html+=`<div class="wpsc" onclick="hlCard(${s.n})"><div class="wpsci">
+        <div class="wpscn">№${s.n} · Часть ${s.p}</div>
+        ${s.w?`<div class="wpscw">${s.w}</div>`:''}
+        <div class="wpscr">${s.r}</div>
+      </div></div>`;
+    });
+  }
+  if((d.rel||[]).length){
+    html+='<div class="wpsec">СВЯЗАННЫЕ СЛОВА</div>';
+    html+=`<div class="wprel">${d.rel.map(r=>`<span class="wprelc" onclick="openW('${r}')">${r}</span>`).join('')}</div>`;
+  }
+  document.getElementById('wpb').innerHTML=html;
+  document.getElementById('wp').classList.add('open');
+  if(!document.getElementById('pg-sentences').classList.contains('on')){
+    document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));
+    document.querySelectorAll('.nb').forEach(x=>x.classList.remove('on'));
+    document.getElementById('pg-sentences').classList.add('on');
+    document.querySelector('.nb').classList.add('on');
+  }
+  document.querySelectorAll('.scard').forEach(c=>c.classList.remove('hl'));
+  sents.forEach(s=>{
+    const c=document.querySelector(`.scard[data-n="${s.n}"]`);
+    if(c)c.classList.add('hl');
+  });
+}
+
+function closeP(){
+  document.getElementById('wp').classList.remove('open');
+  document.querySelectorAll('.scard').forEach(c=>c.classList.remove('hl'));
+  document.querySelectorAll('.wchip').forEach(c=>c.classList.remove('on'));
+}
+
+function hlCard(n){
+  const c=document.querySelector(`.scard[data-n="${n}"]`); if(!c) return;
+  cFilt='all'; cSrch=''; document.getElementById('si').value='';
+  document.querySelectorAll('.ft').forEach(t=>t.classList.remove('on'));
+  document.querySelector('.ft').classList.add('on');
+  applyF();
+  c.scrollIntoView({behavior:'smooth',block:'center'});
+  const b=c.querySelector('.scbody'),tg=c.querySelector('.sctog');
+  if(!b.classList.contains('open')){b.classList.add('open');tg.textContent='▾';}
+}
+
+buildAll();
+</script></body></html>
